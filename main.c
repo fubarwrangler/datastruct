@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
     linked_list *words;
     int n = 0;
 
-    if((fp = fopen("wordlist.txt", "r")) == NULL)
+    if((fp = fopen("tests/wordlist.txt", "r")) == NULL)
     {
         printf("Error opening word file\n");
         return 1;
