@@ -45,9 +45,10 @@ int main(int argc, char *argv[])
     FILE *fp;
     char *tmp;
     linked_list *words;
+    list_node *p = NULL;
     int n = 0;
 
-    if((fp = fopen("tests/wordlist.txt", "r")) == NULL)
+    if((fp = fopen("tests/words.txt", "r")) == NULL)
     {
         printf("Error opening word file\n");
         return 1;
@@ -61,17 +62,23 @@ int main(int argc, char *argv[])
     words = list_init();
 
     while((fgets(tmp, 512, fp)) != NULL && n < 2000)
-        list_insert(words, tmp, strlen(tmp) - 1);
+        p = list_insert(words, p, tmp, strlen(tmp) - 1);
 
     free(tmp);
     fclose(fp);
 
 
-    //list_printer(words);
+    list_printer(words);
     printf("List has %ld elements\n", list_size(words));
-    char *item = "aardvark";
 
-    printf("Index of \"%s\": %d", item, list_search(words, item, myfind));
+    list_shuffle(words);
+    //list_swap(words->head, words->head->next->next->next->next->next->next->next);
+    list_printer(words);
+
+    //printf("Enter word to search: ");
+    //scanf("%s", &item);
+    //printf("Index of \"%s\": %d", item, list_search(words, item, myfind));
+
 
     list_destroy(words);
 

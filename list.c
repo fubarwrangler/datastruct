@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "list.h"
 
@@ -81,27 +82,34 @@ list_node *list_insert_after(list_node *node, void *data, size_t len)
         node->next = newnode;
         newnode->next = tmpnode;
     }
-    return node;
+    return newnode;
 }
 
 /**
- * list_insert()
+ * list_insert_head()
  *  Insert data at the head of linked list given by *list
  *  @list -- Pointer to list to operate on
  *  @data -- Data to insert in the new node
  *  @len  -- Length of the data to insert
  *  @return -- pointer to the newly created node
  */
-list_node *list_insert(linked_list *list, void *data, size_t len)
+list_node *list_insert_head(linked_list *list, void *data, size_t len)
 {
     void *tmp_data = NULL;
     list_node *tmpnode = NULL, *newnode = NULL;
 
+    /* Allocate new space for the node and the the new data */
     newnode = malloc(sizeof(list_node));
-    tmp_data = malloc(len + 1);
-    if(tmp_data == NULL || newnode == NULL)
+    if(newnode == NULL)
     {
-        fprintf(stderr, "Error: no memory for data or next node\n");
+        fprintf(stderr, "Error: no memory for the next node");
+        return NULL;
+    }
+    tmp_data = malloc(len + 1);
+    if(tmp_data == NULL)
+    {
+        free(newnode);
+        fprintf(stderr, "Error: no memory for data (%d) bytes\n", len);
         return NULL;
     }
     memcpy(tmp_data, data, len);
@@ -112,6 +120,23 @@ list_node *list_insert(linked_list *list, void *data, size_t len)
     newnode->next = tmpnode;
 
     return newnode;
+}
+
+/**
+ * list_insert()
+ *  Insert data into a list at the head (if *prev is NULL) or after *prev
+ *  @list -- Pointer to list to operate on
+ *  @prev -- Pointer to node to insert after
+ *  @data -- Data to insert in the new node
+ *  @len  -- Length of the data to insert
+ *  @return -- pointer to the newly created node
+ */
+list_node *list_insert(linked_list *list, list_node *prev, void *data, size_t len)
+{
+    if(prev == NULL)
+        return list_insert_head(list, data, len);
+    else
+        return list_insert_after(prev, data, len);
 }
 
 /** list_delete_next()
@@ -242,4 +267,53 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
     }
 
     return result;
+}
+
+void list_swap(list_node *p, list_node *q)
+{
+    list_node *tmp, *tmp1;
+
+    if(q->next == NULL || p->next == NULL)
+    {
+        fprintf(stderr, "Library error: cannot swap nodes past end of list\n");
+        return;
+    }
+
+    tmp = q->next->next;
+    q->next->next = p->next->next;
+    p->next->next = tmp;
+
+    tmp = q->next;
+    q->next = p->next;
+    p->next = tmp;
+}
+
+
+void list_shuffle(linked_list *list)
+{
+    int len = list_size(list);
+    int pos = 0, to_go, i;
+    list_node *p, *q, *tmp1, *tmp;
+
+    srand48(69);
+    p = list->head;
+    while(p)
+    {
+        to_go = (lrand48() % (len - pos - 1)) + 1;
+        q = p;
+        for(i=0; i<to_go; i++)
+            q = q->next;
+
+        list_swap(p, q);
+
+
+        p = p->next;
+
+        pos++;
+        printf("************\n");
+        list_printer(list);
+    }
+
+
+    return;
 }
