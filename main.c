@@ -34,7 +34,7 @@ void list_printer(linked_list *lst)
 
     while(p)
     {
-        printf("%d: %s\n", ctr++, (char *)p->data);
+        printf("%8x: (%2d) %18s (next -> %8x)\n", p, ctr++, (char *)p->data, p->next);
         p = p->next;
     }
 }
@@ -72,7 +72,6 @@ int main(int argc, char *argv[])
     printf("List has %ld elements\n", list_size(words));
 
     list_shuffle(words);
-    //list_swap(words->head, words->head->next->next->next->next->next->next->next);
     list_printer(words);
 
     //printf("Enter word to search: ");

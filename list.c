@@ -164,27 +164,49 @@ list_node *list_delete_next(list_node *node)
 /** list_delete_head()
  *  Delete the head node of a linked list.
  *  @list -- pointer to linked list to operate on
- *  @return -- *list: a pointer to the list, or NULL to indicate a programming
- *                    error (head node doesn't exist)
+ *  @return -- a pointer to the new head, or NULL on error
  */
-linked_list *list_delete_head(linked_list *list)
+list_node *list_delete_head(linked_list *list)
 {
     list_node *oldhead;
+
     if(list->head != NULL)
     {
         oldhead = list->head;
         list->head = oldhead->next;
         free(oldhead->data);
         free(oldhead);
-        return list;
+        return list->head;
     }
     else
     {
         fprintf(stderr, "Library error: list_delete_head: list->head = NULL\n");
         return NULL;
     }
-
 }
+
+
+/**
+ * list_get_index()
+ *  Get the node at index (index = 0 is list->head, 1 is head->next, etc...)
+ *
+ * @list -- Pointer to list
+ * @index -- the integer index to retrieve (0 <= index < list_size(list))
+ * @return -- A pointer to the node at index (NULL if index > list_size)
+ */
+list_node *list_get_index(linked_list *list, size_t index)
+{
+    list_node *p;
+    size_t j;
+
+    p = list->head;
+
+    while(j++ < index && (p = p->next))
+        ;
+
+    return p;
+}
+
 
 /**
  * list_apply()
@@ -205,21 +227,21 @@ list_node *list_apply(list_node *node, void *(*fn)(void *))
  * list_reverse()
  *  Reverses a list in place in O(n)
  *  @list -- pointer to the list to reverse
- *  @ret -- Nothing
+ *  @ret -- The new head or NULL on error
  */
-void list_reverse(linked_list *list)
+list_node *list_reverse(linked_list *list)
 {
     list_node *p = NULL, *q = NULL, *tmp = NULL;
 
     if(list->head == NULL)
     {
         printf("Library error: list_reverse -- cannot reverse an empty list\n");
-        return;
+        return NULL;
     }
     if(list->head->next == NULL)
     {
-        printf("Library warning: list_reverse -- trivial to reverse one-element list\n");
-        return;
+        //printf("Library warning: list_reverse -- trivial to reverse one-element list\n");
+        return list->head;
     }
 
     /* q is one step ahead of p, they walk in step turning q->next to point
@@ -237,8 +259,15 @@ void list_reverse(linked_list *list)
     }
     list->head->next = NULL;
     list->head = p;
+    return list->head;
 }
 
+/**
+ * list_size()
+ *  Walks the list to the end and returns the length
+ *  @list -- pointer to the list to measure
+ *  @ret -- Nothing
+ */
 size_t list_size(linked_list *list)
 {
     size_t ctr = 0;
@@ -251,6 +280,16 @@ size_t list_size(linked_list *list)
     return ctr;
 }
 
+/**
+ * list_search()
+ *  Searches for an item in the list (O(list_size))
+ *  @list -- pointer to the list to search in
+ *  @compare -- pointer to the data to search for in the list
+ *  @search_fn -- pointer to function that takes two args, the first being the
+                  data in the list and the second being supplied in *compare,
+                  and returns non-zero on a match.
+ *  @ret -- index of found item, or -1 on not found
+ */
 int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void *))
 {
     list_node *p = list->head;
@@ -269,23 +308,58 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
     return result;
 }
 
-void list_swap(list_node *p, list_node *q)
+/**
+ * list_swap_next()
+ *  Swap the nodes that follow the two nodes given here (p->next and q->next
+    are swapped).
+ *  @p, @q -- the nodes whose next node will be swapped
+ *  @ret -- One of the swapped nodes or NULL on error
+ */
+list_node *list_swap_next(list_node *p, list_node *q)
 {
     list_node *tmp, *tmp1;
 
     if(q->next == NULL || p->next == NULL)
     {
         fprintf(stderr, "Library error: cannot swap nodes past end of list\n");
-        return;
+        return NULL;
     }
-
-    tmp = q->next->next;
-    q->next->next = p->next->next;
-    p->next->next = tmp;
 
     tmp = q->next;
     q->next = p->next;
     p->next = tmp;
+
+    tmp = q->next->next;
+    q->next->next = p->next->next;
+    p->next->next = tmp;
+    return q;
+}
+
+/**
+ * list_swap_head()
+ *  Swap the head node of *list with *p
+ *  @list -- pointer to the list which ->head should be swapped
+ *  @p -- the list node whose ->next will be swapped with the head
+ *  @ret -- New head or NULL on error
+ */
+list_node *list_swap_head(linked_list *list, list_node *p)
+{
+    list_node *tmp, *tmp1;
+
+    if(p->next == NULL)
+    {
+        fprintf(stderr, "Library error: list_swap_head -- p->next is NULL");
+        return NULL;
+    }
+
+    tmp = list->head;
+    tmp1 = p->next->next;
+    list->head = p->next;
+    list->head->next = tmp->next;
+    p->next = tmp;
+    p->next->next = tmp1;
+
+    return list->head;
 }
 
 
@@ -295,25 +369,23 @@ void list_shuffle(linked_list *list)
     int pos = 0, to_go, i;
     list_node *p, *q, *tmp1, *tmp;
 
-    srand48(69);
+    srand48(8);
     p = list->head;
-    while(p)
+    while(p->next)
     {
-        to_go = (lrand48() % (len - pos - 1)) + 1;
+        to_go = (lrand48() % (len - pos - 1));
         q = p;
-        for(i=0; i<to_go; i++)
+        for(i=0; i < to_go; i++)
             q = q->next;
 
-        list_swap(p, q);
-
-
-        p = p->next;
-
+        tmp = p->next;
+        if(pos == 0)
+            list_swap_head(list, q);
+        else
+            list_swap_next(p, q);
+        p = tmp;
+        printf("%d: %d\n", pos, pos+to_go);
         pos++;
-        printf("************\n");
-        list_printer(list);
     }
-
-
     return;
 }
