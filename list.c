@@ -332,6 +332,7 @@ list_node *list_swap_next(list_node *p, list_node *q)
     tmp = q->next->next;
     q->next->next = p->next->next;
     p->next->next = tmp;
+
     return q;
 }
 
@@ -353,39 +354,50 @@ list_node *list_swap_head(linked_list *list, list_node *p)
     }
 
     tmp = list->head;
-    tmp1 = p->next->next;
     list->head = p->next;
-    list->head->next = tmp->next;
     p->next = tmp;
-    p->next->next = tmp1;
+
+    tmp = list->head->next;
+    list->head->next = p->next->next;
+    p->next->next = tmp;
 
     return list->head;
 }
 
-
+/* FIXME: This doesn't work well on small lists, and is likely not a proper
+ *        random shuffle, with bias towards something or another
+ */
 void list_shuffle(linked_list *list)
 {
     int len = list_size(list);
     int pos = 0, to_go, i;
     list_node *p, *q, *tmp1, *tmp;
 
-    srand48(8);
+    if(len < 2)
+        return;
+
+    srand48(time(NULL));
     p = list->head;
     while(p->next)
     {
-        to_go = (lrand48() % (len - pos - 1));
+        to_go = lrand48() % (len - pos - 1);
+        //printf("%d: %d\n", pos, pos+to_go);
         q = p;
         for(i=0; i < to_go; i++)
             q = q->next;
+        //printf("p: %x, q: %x\n", p, q);
 
-        tmp = p->next;
-        if(pos == 0)
+        if(pos == 0 && to_go > 0)
+        {
             list_swap_head(list, q);
+            p = list->head->next;
+        }
         else
+        {
             list_swap_next(p, q);
-        p = tmp;
-        printf("%d: %d\n", pos, pos+to_go);
+            p = p->next;
+        }
+        //list_printer(list);
         pos++;
     }
-    return;
 }

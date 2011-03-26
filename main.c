@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     list_node *p = NULL;
     int n = 0;
 
-    if((fp = fopen("tests/words.txt", "r")) == NULL)
+    if((fp = fopen("tests/ordered.txt", "r")) == NULL)
     {
         printf("Error opening word file\n");
         return 1;
@@ -71,7 +71,12 @@ int main(int argc, char *argv[])
     list_printer(words);
     printf("List has %ld elements\n", list_size(words));
 
+
+    //list_swap_next(words->head->next->next->next->next->next->next->next->next->next,
+    //               words->head->next->next->next->next->next->next->next->next->next);
     list_shuffle(words);
+    //list_swap_head(words, words->head);
+    printf("DONE: \n");
     list_printer(words);
 
     //printf("Enter word to search: ");
