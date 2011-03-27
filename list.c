@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
+#include <sys/time.h>
 
 #include "list.h"
 
@@ -109,7 +110,7 @@ list_node *list_insert_head(linked_list *list, void *data, size_t len)
     if(tmp_data == NULL)
     {
         free(newnode);
-        fprintf(stderr, "Error: no memory for data (%d) bytes\n", len);
+        fprintf(stderr, "Error: no memory for data (%ld) bytes\n", len);
         return NULL;
     }
     memcpy(tmp_data, data, len);
@@ -317,7 +318,7 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
  */
 list_node *list_swap_next(list_node *p, list_node *q)
 {
-    list_node *tmp, *tmp1;
+    list_node *tmp;
 
     if(q->next == NULL || p->next == NULL)
     {
@@ -345,7 +346,7 @@ list_node *list_swap_next(list_node *p, list_node *q)
  */
 list_node *list_swap_head(linked_list *list, list_node *p)
 {
-    list_node *tmp, *tmp1;
+    list_node *tmp;
 
     if(p->next == NULL)
     {
@@ -364,40 +365,43 @@ list_node *list_swap_head(linked_list *list, list_node *p)
     return list->head;
 }
 
-/* FIXME: This doesn't work well on small lists, and is likely not a proper
+/**
+ * list_shuffle()
+ *  Shuffle a list in-place, seeding RNG with the current time-microsecond
+ *
+ *  @list -- The list to operate on
+ *
+ * FIXME: This doesn't work well on small lists, and is likely not a proper
  *        random shuffle, with bias towards something or another
  */
 void list_shuffle(linked_list *list)
 {
     int len = list_size(list);
-    int pos = 0, to_go, i;
-    list_node *p, *q, *tmp1, *tmp;
+    int pos = 1, to_go, i;
+    list_node *p, *q;
+    struct timeval t;
 
     if(len < 2)
         return;
 
-    srand48(time(NULL));
+    gettimeofday(&t, NULL);
+    srand48(t.tv_sec ^ t.tv_usec);
+
+    q = list->head;
+    for(i=0; i< lrand48() % (len - 1); i++)
+        q = q->next;
+    list_swap_head(list, q);
     p = list->head;
+
     while(p->next)
     {
-        to_go = lrand48() % (len - pos - 1);
-        //printf("%d: %d\n", pos, pos+to_go);
+        to_go = lrand48() % (len - pos);
         q = p;
         for(i=0; i < to_go; i++)
             q = q->next;
-        //printf("p: %x, q: %x\n", p, q);
 
-        if(pos == 0 && to_go > 0)
-        {
-            list_swap_head(list, q);
-            p = list->head->next;
-        }
-        else
-        {
-            list_swap_next(p, q);
-            p = p->next;
-        }
-        //list_printer(list);
+        list_swap_next(p, q);
+        p = p->next;
         pos++;
     }
 }

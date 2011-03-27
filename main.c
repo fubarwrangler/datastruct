@@ -46,7 +46,7 @@ int main(int argc, char *argv[])
     char *tmp;
     linked_list *words;
     list_node *p = NULL;
-    int n = 0;
+    int n = 0, i;
 
     if((fp = fopen("tests/ordered.txt", "r")) == NULL)
     {
@@ -61,21 +61,23 @@ int main(int argc, char *argv[])
     }
     words = list_init();
 
-    while((fgets(tmp, 512, fp)) != NULL && n < 2000)
+    while((fgets(tmp, 512, fp)) != NULL && n++ < 2000)
         p = list_insert(words, p, tmp, strlen(tmp) - 1);
 
     free(tmp);
     fclose(fp);
 
 
-    list_printer(words);
+    //list_printer(words);
     printf("List has %ld elements\n", list_size(words));
 
 
     //list_swap_next(words->head->next->next->next->next->next->next->next->next->next,
     //               words->head->next->next->next->next->next->next->next->next->next);
-    list_shuffle(words);
+    for(i=0; i< 2000; i++)
+        list_shuffle(words);
     //list_swap_head(words, words->head);
+    //list_swap_next(words->head, words->head->next);
     printf("DONE: \n");
     list_printer(words);
 
