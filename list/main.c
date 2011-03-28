@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
     list_node *p = NULL;
     int n = 0, i;
 
-    if((fp = fopen("tests/ordered.txt", "r")) == NULL)
+    if((fp = fopen("tests/wordlist.txt", "r")) == NULL)
     {
         printf("Error opening word file\n");
         return 1;
@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     }
     words = list_init();
 
-    while((fgets(tmp, 512, fp)) != NULL && n++ < 2000)
+    while((fgets(tmp, 512, fp)) != NULL && n++ < 30000)
         p = list_insert(words, p, tmp, strlen(tmp) - 1);
 
     free(tmp);
@@ -74,12 +74,12 @@ int main(int argc, char *argv[])
 
     //list_swap_next(words->head->next->next->next->next->next->next->next->next->next,
     //               words->head->next->next->next->next->next->next->next->next->next);
-    for(i=0; i< 2000; i++)
+    //for(i=0; i< 2000; i++)
         list_shuffle(words);
     //list_swap_head(words, words->head);
     //list_swap_next(words->head, words->head->next);
     printf("DONE: \n");
-    list_printer(words);
+    //list_printer(words);
 
     //printf("Enter word to search: ");
     //scanf("%s", &item);
