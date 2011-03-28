@@ -312,7 +312,7 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
 /**
  * list_swap_next()
  *  Swap the nodes that follow the two nodes given here (p->next and q->next
-    are swapped).
+ *  are swapped).
  *  @p, @q -- the nodes whose next node will be swapped
  *  @ret -- One of the swapped nodes or NULL on error
  */

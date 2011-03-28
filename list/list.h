@@ -1,5 +1,5 @@
-#ifndef _LIST_H
-#define _LIST_H
+#ifndef _SLLIST_H
+#define _SLLIST_H
 
 typedef struct llnode
 {
@@ -40,4 +40,3 @@ void list_shuffle(linked_list *list);
 
 
 #endif
-
