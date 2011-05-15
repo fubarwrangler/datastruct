@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "dllist.h"
 
 
 dllist *dllist_init(void)
@@ -16,7 +17,7 @@ dllist *dllist_init(void)
 }
 
 
-void dllist_destroy(dllist *list);
+void dllist_destroy(dllist *list)
 {
     dlnode *p, *q;
     if (list != NULL)

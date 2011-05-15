@@ -4,7 +4,7 @@
 #include <time.h>
 #include <sys/time.h>
 
-#include "list.h"
+#include "sllist.h"
 
 /** list_init()
  *  Allocates a new linked list and returns a pointer to it, will possibly
@@ -198,7 +198,7 @@ list_node *list_delete_head(linked_list *list)
 list_node *list_get_index(linked_list *list, size_t index)
 {
     list_node *p;
-    size_t j;
+    size_t j = 0;
 
     p = list->head;
 
@@ -211,7 +211,8 @@ list_node *list_get_index(linked_list *list, size_t index)
 
 /**
  * list_apply()
- *  Apply the function pointed to by (*fn) to node->data
+ *  Apply the function pointed to by (*fn) to node->data, replacing
+ *  data with what is returned by the function
  *
  * @node -- Pointer to node to start at
  * @fn   -- function pointer to function taking old data as argument and

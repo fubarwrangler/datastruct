@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "list.h"
+#include "sllist.h"
 
 void *myupper(void *str)
 {
