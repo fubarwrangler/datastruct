@@ -18,7 +18,7 @@ linked_list *list_init(void)
     lst = malloc(sizeof(linked_list));
     if(lst == NULL)
     {
-        printf("Error: no memory for list\n");
+        fprintf(stderr, "Error: no memory for list\n");
         return NULL;
     }
     lst->head = NULL;
@@ -74,7 +74,7 @@ list_node *list_insert_after(list_node *node, void *data, size_t len)
     newnode->data = tmp_data;
     if(node == NULL)
     {
-        printf("Library error: list_insert_after: node is NULL\n");
+        fprintf(stderr, "Library error: list_insert_after: node is NULL\n");
         return NULL;
     }
     else
@@ -139,6 +139,53 @@ list_node *list_insert(linked_list *list, list_node *prev, void *data, size_t le
     else
         return list_insert_after(prev, data, len);
 }
+
+/**
+ * list_create_node()
+ *  Create a new list_node object containing *data of given size len
+ *  @data -- Pointer to data to add to new node
+ *  @len -- length of *data
+ *  @return -- New list_node object or NULL on failure
+ */
+list_node *list_create_node(void *data, size_t len)
+{
+    list_node *p = NULL;
+
+    p = malloc(sizeof(list_node));
+    if(p != NULL)
+    {
+        p->next = NULL;
+        p->data = data;
+        p->len = len;
+    }
+    else
+    {
+        fprintf(stderr, "Library error: list_create_node malloc failed");
+    }
+
+    return p;
+}
+
+/** list_insert_node()
+ *  Insert the given node at the head of the given list
+ *  @list -- a pointer to a linked list
+ *  @newnode -- a pointer to a new node to add to @list
+ *  @return -- NULL on error, *new head on success
+ */
+list_node *list_insert_node(linked_list *list, list_node *newnode)
+{
+    if(list == NULL || newnode == NULL)
+    {
+        fprintf(stderr, "Library error: list_insert_node got a NULL argument");
+        return NULL;
+    }
+
+    newnode->next = list->head->next;
+    list->head = newnode;
+
+    return list->head;
+}
+
 
 /** list_delete_next()
  *  Delete the node that comes after the one given in the argument
@@ -219,10 +266,37 @@ list_node *list_get_index(linked_list *list, size_t index)
  *          returning a pointer to that data (presumably modified)
  * @return -- A pointer to the next node in the list
  */
-list_node *list_apply(list_node *node, void *(*fn)(void *))
+inline list_node *list_apply(list_node *node, void *(*fn)(void *))
 {
     node->data = (*fn)(node->data);
     return node->next;
+}
+
+
+/**
+ * list_apply_each()
+ *  Applies function (*fn) to each node's *data object in *list
+ *  @list -- linked list
+ *  @fn -- Pointer to function taking/returning void* to apply
+ *  @return -- NULL on failure, or ptr to list again
+ */
+linked_list *list_apply_each(linked_list *list, void *(*fn)(void *))
+{
+    list_node *p;
+
+    if(list==NULL)
+    {
+        fprintf(stderr, "Library error: list_apply_each passed a NULL list\n");
+        return NULL;
+    }
+
+    p = list->head;
+    while(p)
+    {
+        list_apply(p, fn);
+        p = p->next;
+    }
+    return list;
 }
 
 /**
@@ -237,12 +311,13 @@ list_node *list_reverse(linked_list *list)
 
     if(list->head == NULL)
     {
-        printf("Library error: list_reverse -- cannot reverse an empty list\n");
+        fprintf(stderr, "Library error: list_reverse cannot reverse an empty list\n");
         return NULL;
     }
+
     if(list->head->next == NULL)
     {
-        //printf("Library warning: list_reverse -- trivial to reverse one-element list\n");
+        //fprintf(stderr, "Library warning: list_reverse -- trivial to reverse one-element list\n");
         return list->head;
     }
 

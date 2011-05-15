@@ -36,13 +36,18 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
-		<Unit filename="list.c">
+		<Unit filename="dllist.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="dllist.h" />
 		<Unit filename="list.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
+		<Unit filename="sllist.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="sllist.h" />
 		<Extensions>
 			<code_completion />
 			<envvars />
