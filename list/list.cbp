@@ -40,7 +40,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="dllist.h" />
-		<Unit filename="list.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
