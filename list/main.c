@@ -46,28 +46,23 @@ void list_printer(linked_list *lst)
 int main(int argc, char *argv[])
 {
     FILE *fp;
-    char *tmp;
+    char tmp[512];
     linked_list *words;
     list_node *p = NULL;
-    int n = 0, i;
+    linked_list *copy = NULL;
+    int i, n=0;
 
-    if((fp = fopen("../tests/wordlist.txt", "r")) == NULL)
+    if((fp = fopen("../tests/words.txt", "r")) == NULL)
     {
         printf("Error opening word file\n");
         return 1;
     }
 
-    if((tmp = malloc(512)) == NULL)
-    {
-        printf("No memory");
-        return 1;
-    }
     words = list_init();
 
-    while((fgets(tmp, 512, fp)) != NULL && n++ < 500)
+    while((fgets(tmp, 512, fp)) != NULL && n++ < 4)
         p = list_insert(words, p, tmp, strlen(tmp) - 1);
 
-    free(tmp);
     fclose(fp);
 
 
@@ -75,20 +70,30 @@ int main(int argc, char *argv[])
     printf("List has %ld elements\n", list_size(words));
     list_printer(words);
 
+    copy = list_copy(words);
+
+    printf("Copy:\n");
+    list_printer(copy);
+    list_shuffle(copy);
+    list_apply_each(words, myupper);
+    printf("Old, uppered:\n");
+    list_printer(words);
+    printf("Copy, shuffled:\n");
+    list_printer(copy);
+
     //list_swap_next(words->head->next->next->next->next->next->next->next->next->next,
     //               words->head->next->next->next->next->next->next->next->next->next);
-    //for(i=0; i< 2000; i++)
-        list_shuffle(words);
+
+        //list_shuffle(words);
     //list_swap_head(words, words->head);
     //list_swap_next(words->head, words->head->next);
-    printf("DONE: \n");
-    list_printer(words);
-    list_apply_each(words, myupper);
-    list_printer(words);
+//    printf("DONE: \n");
+//    list_printer(words);
+//    list_apply_each(words, myupper);
+//    list_printer(words);
     //printf("Enter word to search: ");
     //scanf("%s", &item);
     //printf("Index of \"%s\": %d", item, list_search(words, item, myfind));
-
 
     list_destroy(words);
 
