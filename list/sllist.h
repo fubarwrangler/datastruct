@@ -21,7 +21,7 @@ void list_destroy(linked_list *list);
 size_t list_size(linked_list *list);
 list_node *list_get_index(linked_list *list, size_t index);
 list_node *list_create_node(void *data, size_t len);
-
+linked_list *list_copy(linked_list *list);
 
 /* Inserting or deleting from the list */
 list_node *list_delete_next(list_node *node);

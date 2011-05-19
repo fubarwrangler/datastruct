@@ -63,6 +63,12 @@ list_node *list_insert_after(list_node *node, void *data, size_t len)
     void *tmp_data = NULL;
     list_node *tmpnode = NULL, *newnode = NULL;
 
+    if(node == NULL)
+    {
+        fprintf(stderr, "Library error: list_insert_after: node is NULL\n");
+        return NULL;
+    }
+
     newnode = malloc(sizeof(list_node));
     tmp_data = malloc(len + 1);
     if(tmp_data == NULL || newnode == NULL)
@@ -72,17 +78,12 @@ list_node *list_insert_after(list_node *node, void *data, size_t len)
     }
     memcpy(tmp_data, data, len);
     newnode->data = tmp_data;
-    if(node == NULL)
-    {
-        fprintf(stderr, "Library error: list_insert_after: node is NULL\n");
-        return NULL;
-    }
-    else
-    {
-        tmpnode = node->next;
-        node->next = newnode;
-        newnode->next = tmpnode;
-    }
+    newnode->len = len;
+
+    tmpnode = node->next;
+    node->next = newnode;
+    newnode->next = tmpnode;
+
     return newnode;
 }
 
@@ -115,6 +116,7 @@ list_node *list_insert_head(linked_list *list, void *data, size_t len)
     }
     memcpy(tmp_data, data, len);
     newnode->data = tmp_data;
+    newnode->len = len;
 
     tmpnode = list->head;
     list->head = newnode;
@@ -316,10 +318,7 @@ list_node *list_reverse(linked_list *list)
     }
 
     if(list->head->next == NULL)
-    {
-        //fprintf(stderr, "Library warning: list_reverse -- trivial to reverse one-element list\n");
         return list->head;
-    }
 
     /* q is one step ahead of p, they walk in step turning q->next to point
      * the previous element p, storing where to advance q to in tmp...
@@ -384,6 +383,47 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
 
     return result;
 }
+
+/**
+ * list_copy()
+ *  Returns a pointer to a copy of the list given
+ *  @list -- linked list to copy
+ *  @return -- pointer to copy of list
+ */
+ linked_list *list_copy(linked_list *list)
+ {
+    linked_list *newlist = NULL;
+    list_node *p = NULL, *q = NULL;
+    list_node *newnode, tmpnode;
+    int mem_failure = 0;
+
+    newlist = list_init();
+    if(newlist == NULL)
+        return NULL;
+
+    p = list->head;
+    list_insert_head(newlist, p->data, p->len);
+    p = p->next;
+    q = newlist->head;
+
+    while(p)
+    {
+        newnode = malloc(sizeof(list_node));
+        newnode->data = malloc(p->len);
+        newnode->len = p->len;
+        newnode->next = NULL;
+        list_create_node(p->data, p->len);
+
+        memcpy(newnode->data, p->data, p->len);
+        q->next = newnode;
+        q = q->next;
+        p = p->next;
+    }
+
+
+
+    return newlist;
+ }
 
 /**
  * list_swap_next()
