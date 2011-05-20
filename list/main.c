@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
 
 #include "sllist.h"
 
@@ -37,7 +38,7 @@ void list_printer(linked_list *lst)
 
     while(p)
     {
-        printf("%8x: (%2d) %18s (next -> %8x)\n", p, ctr++, (char *)p->data, p->next);
+        printf("%8x: (%2d) %s (%d) (next -> %x)\n", p, ctr++, (char *)p->data, p->len, p->next);
         p = p->next;
     }
 }
@@ -50,6 +51,7 @@ int main(int argc, char *argv[])
     linked_list *words;
     list_node *p = NULL;
     linked_list *copy = NULL;
+    char tstr[30] = {0};
     int i, n=0;
 
     if((fp = fopen("../tests/words.txt", "r")) == NULL)
@@ -60,11 +62,15 @@ int main(int argc, char *argv[])
 
     words = list_init();
 
-    while((fgets(tmp, 512, fp)) != NULL && n++ < 4)
-        p = list_insert(words, p, tmp, strlen(tmp) - 1);
+    while((fgets(tmp, 512, fp)) != NULL && n++ < 40)
+    {
+        i = strlen(tmp);
+        tmp[i - 1] = '\0';
+        p = list_insert(words, p, tmp, i);
+    }
 
     fclose(fp);
-
+    strcpy(tstr, "lowercaseword_here");
 
     //list_printer(words);
     printf("List has %ld elements\n", list_size(words));
@@ -80,20 +86,19 @@ int main(int argc, char *argv[])
     list_printer(words);
     printf("Copy, shuffled:\n");
     list_printer(copy);
+    list_destroy(copy);
 
-    //list_swap_next(words->head->next->next->next->next->next->next->next->next->next,
-    //               words->head->next->next->next->next->next->next->next->next->next);
+    list_delete_head(words);
+    printf("Old, missing head:\n");
+    list_printer(words);
+    printf("Old, with another:\n");
+    list_insert_after(words->head->next->next, tstr, strlen(tstr) + 1);
+    list_printer(words);
+    printf("Index of NET: %d\n", list_search(words, "NET", myfind));
+    printf("Index of net: %d\n", list_search(words, "net", myfind));
 
-        //list_shuffle(words);
-    //list_swap_head(words, words->head);
-    //list_swap_next(words->head, words->head->next);
-//    printf("DONE: \n");
-//    list_printer(words);
-//    list_apply_each(words, myupper);
-//    list_printer(words);
-    //printf("Enter word to search: ");
-    //scanf("%s", &item);
-    //printf("Index of \"%s\": %d", item, list_search(words, item, myfind));
+
+
 
     list_destroy(words);
 
