@@ -14,7 +14,8 @@
  */
 linked_list *list_init(void)
 {
-    linked_list *lst = NULL;
+    linked_list *lst;
+
     lst = malloc(sizeof(linked_list));
     if(lst == NULL)
     {
@@ -22,12 +23,14 @@ linked_list *list_init(void)
         return NULL;
     }
     lst->head = NULL;
+    lst->list_len = 0;
 
     return lst;
 }
 
 /** list_destroy()
- *  Destructively walk a list, freeing objects as you go
+ *  Destructively walk a list, freeing objects as you go, does not free list
+ *      object itself, as it may be statically allocated somewhere...
  *  @list -- a pointer to the linked list to destroy
  *  @return -- Nothing
  */
@@ -35,18 +38,21 @@ void list_destroy(linked_list *list)
 {
     list_node *p = NULL, *tmp = NULL;
 
-    if(list->head != NULL)
+    if(list != NULL)
     {
-        p = list->head;
-        while(p)
+        if(list->head != NULL)
         {
-            free(p->data);
-            tmp = p->next;
-            free(p);
-            p = tmp;
+            p = list->head;
+            while(p)
+            {
+                free(p->data);
+                tmp = p->next;
+                free(p);
+                p = tmp;
+            }
         }
+        free(list);
     }
-    free(list);
 }
 
 /** list_insert_after()
@@ -104,14 +110,14 @@ list_node *list_insert_head(linked_list *list, void *data, size_t len)
     newnode = malloc(sizeof(list_node));
     if(newnode == NULL)
     {
-        fprintf(stderr, "Error: no memory for the next node");
+        fprintf(stderr, "Library Error: list_insert_head -- no memory for the next node");
         return NULL;
     }
     tmp_data = malloc(len + 1);
     if(tmp_data == NULL)
     {
         free(newnode);
-        fprintf(stderr, "Error: no memory for data (%ld) bytes\n", len);
+        fprintf(stderr, "Library Error: list_insert_head -- no memory for data (%ld) bytes\n", len);
         return NULL;
     }
     memcpy(tmp_data, data, len);
@@ -188,7 +194,6 @@ list_node *list_insert_node(linked_list *list, list_node *newnode)
     return list->head;
 }
 
-
 /** list_delete_next()
  *  Delete the node that comes after the one given in the argument
  *  @node -- a pointer to a node in a linked list
@@ -235,7 +240,6 @@ list_node *list_delete_head(linked_list *list)
     }
 }
 
-
 /**
  * list_get_index()
  *  Get the node at index (index = 0 is list->head, 1 is head->next, etc...)
@@ -257,7 +261,6 @@ list_node *list_get_index(linked_list *list, size_t index)
     return p;
 }
 
-
 /**
  * list_apply()
  *  Apply the function pointed to by (*fn) to node->data, replacing
@@ -273,7 +276,6 @@ inline list_node *list_apply(list_node *node, void *(*fn)(void *))
     node->data = (*fn)(node->data);
     return node->next;
 }
-
 
 /**
  * list_apply_each()
@@ -393,34 +395,65 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
  linked_list *list_copy(linked_list *list)
  {
     linked_list *newlist = NULL;
-    list_node *p = NULL, *q = NULL;
-    list_node *newnode, tmpnode;
+    list_node *newnode;
+    list_node *p, *q;
     int mem_failure = 0;
 
-    newlist = list_init();
-    if(newlist == NULL)
-        return NULL;
-
-    p = list->head;
-    list_insert_head(newlist, p->data, p->len);
-    p = p->next;
-    q = newlist->head;
-
-    while(p)
+    if(list == NULL)
     {
-        newnode = malloc(sizeof(list_node));
-        newnode->data = malloc(p->len);
-        newnode->len = p->len;
-        newnode->next = NULL;
-        list_create_node(p->data, p->len);
-
-        memcpy(newnode->data, p->data, p->len);
-        q->next = newnode;
-        q = q->next;
-        p = p->next;
+        fprintf(stderr, "Library Error: list_copy passed a NULL list");
+        return NULL;
     }
 
+    newlist = list_init();
 
+    if(newlist != NULL)
+    {
+        if(list->head != NULL)
+        {
+            p = list->head;
+            if(list_insert_head(newlist, p->data, p->len) == NULL)
+            {
+                fprintf(stderr, "Library Error: list_copy -- malloc failure for new node");
+                free(newlist);
+                return NULL;
+            }
+            q = newlist->head;
+
+            while((p = p->next))
+            {
+                newnode = malloc(sizeof(list_node));
+                if(newnode == NULL)
+                {
+                    mem_failure = 1;
+                    break;
+                }
+                newnode->data = malloc(p->len);
+                if(newnode->data == NULL)
+                {
+                    mem_failure = 1;
+                    free(newnode);
+                    break;
+                }
+
+                newnode->len = p->len;
+                newnode->next = NULL;
+
+                memcpy(newnode->data, p->data, p->len);
+                q->next = newnode;
+                q = q->next;
+            }
+            /* Clean up  */
+            if(mem_failure)
+            {
+                fprintf(stderr, "Library Error: list_copy -- malloc failure for new node");
+                list_destroy(newlist);
+                free(newlist);
+                newlist = NULL;
+            }
+
+        }
+    }
 
     return newlist;
  }
