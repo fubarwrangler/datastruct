@@ -9,11 +9,9 @@ void *myupper(void *str)
 {
     char *p;
     p = str;
-    while(*p)
-    {
+    do
         *p = toupper(*p);
-        *p++;
-    }
+    while(*p++);
     return str;
 }
 
@@ -38,7 +36,7 @@ void list_printer(linked_list *lst)
 
     while(p)
     {
-        printf("%8x: (%2d) %s (%d) (next -> %x)\n", p, ctr++, (char *)p->data, p->len, p->next);
+        printf("%p: (%2d) %s (%ld) (next -> %p)\n", p, ctr++, (char *)p->data, p->len, p->next);
         p = p->next;
     }
 }
@@ -86,7 +84,7 @@ int main(int argc, char *argv[])
     list_printer(words);
     printf("Copy, shuffled:\n");
     list_printer(copy);
-    list_destroy(copy);
+    //list_destroy(copy);
 
     list_delete_head(words);
     printf("Old, missing head:\n");
@@ -97,9 +95,19 @@ int main(int argc, char *argv[])
     printf("Index of NET: %d\n", list_search(words, "NET", myfind));
     printf("Index of net: %d\n", list_search(words, "net", myfind));
 
+    //list_join_after(words->head->next, copy);
+    list_join(words, copy);
+    printf("After splice: \n");
+    list_printer(words);
+
+    printf("12th node here: %s\n", list_get_index(words, 12)->data);
+    p = list_pop_next(list_get_index(words, 11));
+    printf("Data from pop'd node: %s\n", p->data);
+    list_destroy_node(p);
+    list_printer(words);
 
 
-
+    free(copy);
     list_destroy(words);
 
     return 0;
