@@ -3,6 +3,7 @@
 #include <string.h>
 #include <time.h>
 #include <sys/time.h>
+#include <assert.h>
 
 #include "sllist.h"
 
@@ -174,6 +175,21 @@ list_node *list_create_node(void *data, size_t len)
     return p;
 }
 
+/**
+ * list_destroy_node()
+ *  Free memory associated with given list node
+ *
+ * @node -- Pointer to list node to free
+ */
+
+void list_destroy_node(list_node *node)
+{
+    if (node->data != NULL)
+        free(node->data);
+    free(node);
+}
+
+
 /** list_insert_node()
  *  Insert the given node at the head of the given list
  *  @list -- a pointer to a linked list
@@ -238,6 +254,25 @@ list_node *list_delete_head(linked_list *list)
         fprintf(stderr, "Library error: list_delete_head: list->head = NULL\n");
         return NULL;
     }
+}
+
+/**
+ * list_pop_next()
+ *  Remove the node after one given from list and return it
+ *
+ * @node -- Pointer to node who's successor will be removed/returned
+ * @return -- A pointer to the node that has been removed
+ */
+list_node *list_pop_next(list_node *node)
+{
+    list_node *p, *r;
+    assert(node->next != NULL);
+
+    p = node->next->next;
+    r = node->next;
+    node->next = p;
+
+    return r;
 }
 
 /**
@@ -448,7 +483,6 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
             {
                 fprintf(stderr, "Library Error: list_copy -- malloc failure for new node");
                 list_destroy(newlist);
-                free(newlist);
                 newlist = NULL;
             }
 
@@ -457,6 +491,52 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
 
     return newlist;
  }
+
+/**
+ * list_join()
+ *  Splice the second list onto the tail of the first
+ * @first -- List to append to
+ * @second -- List to append
+ * @return -- First list again
+ */
+ linked_list *list_join(linked_list *first, linked_list *second)
+ {
+     list_node *p, *q;
+
+    assert(second->head != NULL);
+
+    p = first->head;
+    while(p->next)
+        p = p->next;
+
+    assert(p->next == NULL);
+    printf("P is %p", p);
+
+
+    p->next = second->head;
+    return first;
+ }
+
+/**
+ * list_join_after()
+ *  Splice a second list after a given node
+ * @node -- Splice list after this node
+ * @joinee -- list to join into the first one after *node
+ * @return -- next node
+ */
+list_node *list_join_after(list_node *node, linked_list *joinee)
+{
+    list_node *p, *save;
+
+    save = node->next;
+    node->next = joinee->head;
+    p = joinee->head;
+    while(p->next)
+        p = p->next;
+    p->next = save;
+
+    return(node->next);
+}
 
 /**
  * list_swap_next()
