@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 #include "dllist.h"
 
@@ -107,7 +108,7 @@ void dllist_destroy_node(dlnode *node)
     free(node);
 }
 
-dlnode *dllist_swap(dllist *list, node *a, node *b)
+dlnode *dllist_swap(dllist *list, dlnode *a, dlnode *b)
 {
     dlnode *p, *q;
 
