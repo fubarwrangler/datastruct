@@ -427,8 +427,8 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
  *  @list -- linked list to copy
  *  @return -- pointer to copy of list
  */
- linked_list *list_copy(linked_list *list)
- {
+linked_list *list_copy(linked_list *list)
+{
     linked_list *newlist = NULL;
     list_node *newnode;
     list_node *p, *q;
@@ -499,9 +499,9 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
  * @second -- List to append
  * @return -- First list again
  */
- linked_list *list_join(linked_list *first, linked_list *second)
- {
-     list_node *p, *q;
+linked_list *list_join(linked_list *first, linked_list *second)
+{
+    list_node *p;
 
     assert(second->head != NULL);
 
@@ -509,13 +509,10 @@ int list_search(linked_list *list, void *compare, int (*search_fn)(void *, void 
     while(p->next)
         p = p->next;
 
-    assert(p->next == NULL);
-    printf("P is %p", p);
-
-
     p->next = second->head;
+
     return first;
- }
+}
 
 /**
  * list_join_after()
