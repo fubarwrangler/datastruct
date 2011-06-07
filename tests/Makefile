@@ -1,8 +1,11 @@
 SRC = sllist_test.c
+CFLAGS = -Wall -march=core2
+TESTS = sllist_test
 
-include ../Makefile.inc
+all: $(TESTS)
 
-CFLAGS += -march=core2
+sllist_test: sllist_test.c
+	$(CC) $(CFLAGS) -I ../include $@.c ../list/liblist.a -o $@
 
-%.o: %.c
-	$(CC) $(CFLAGS) -I $(INCFLAGS) $? -o $@
+clean:
+	rm $(TESTS)
