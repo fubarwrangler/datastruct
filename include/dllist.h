@@ -20,6 +20,7 @@ typedef struct dllist
 
 dllist *dllist_init(void);
 void dllist_destroy(dllist *l);
+size_t dllist_size(dllist *list);
 
 
 dlnode *list_insert_head(dllist *list, dlnode *node);
