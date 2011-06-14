@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     char tstr[30] = {0};
     int i, n=0;
 
-    if((fp = fopen("../tests/words.txt", "r")) == NULL)
+    if((fp = fopen("data/words.txt", "r")) == NULL)
     {
         printf("Error opening word file\n");
         return 1;

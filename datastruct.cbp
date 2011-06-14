@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_project_file>
+	<FileVersion major="1" minor="6" />
+	<Project>
+		<Option title="datastruct" />
+		<Option pch_mode="2" />
+		<Option compiler="gcc" />
+		<Build>
+			<Target title="list">
+				<Option output="liblist" prefix_auto="1" extension_auto="1" />
+				<Option working_dir="" />
+				<Option type="2" />
+				<Option compiler="gcc" />
+				<Option createDefFile="1" />
+			</Target>
+			<Target title="sllist_test">
+				<Option output="tests/sllist_test" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
+			<Target title="dllist_test">
+				<Option output="tests/dllist_test" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+			</Target>
+		</Build>
+		<Compiler>
+			<Add option="-Wall" />
+			<Add directory="/home/willsk/git/datastruct/include" />
+		</Compiler>
+		<Unit filename="include/dllist.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="include/sllist.h">
+			<Option target="&lt;{~None~}&gt;" />
+		</Unit>
+		<Unit filename="list/dllist.c">
+			<Option compilerVar="CC" />
+			<Option target="list" />
+			<Option target="dllist_test" />
+		</Unit>
+		<Unit filename="list/sllist.c">
+			<Option compilerVar="CC" />
+			<Option target="list" />
+			<Option target="sllist_test" />
+		</Unit>
+		<Unit filename="tests/dllist_test.c">
+			<Option compilerVar="CC" />
+			<Option target="dllist_test" />
+		</Unit>
+		<Unit filename="tests/sllist_test.c">
+			<Option compilerVar="CC" />
+			<Option target="sllist_test" />
+		</Unit>
+		<Extensions>
+			<code_completion />
+			<debugger />
+			<lib_finder disable_auto="1" />
+		</Extensions>
+	</Project>
+</CodeBlocks_project_file>
