@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <assert.h>
 
 #include "dllist.h"
 
@@ -36,6 +37,7 @@ void dllist_destroy(dllist *list)
             free(p);
             p = q;
         }
+        free(list);
     }
 }
 
@@ -45,6 +47,8 @@ dlnode *dllist_insert_head(dllist *list, dlnode *node)
     dlnode *p;
 
     p = list->head;
+    if(p != NULL)
+        p->prev = node;
     list->head = node;
     node->prev = NULL;
     node->next = p;
@@ -98,6 +102,8 @@ dlnode *dllist_create_node(void *data, size_t len)
     }
     memmove(p->data, data, len);
     p->len = len;
+    p->next = NULL;
+    p->prev = NULL;
     return p;
 }
 
@@ -123,3 +129,13 @@ dlnode *dllist_swap(dllist *list, dlnode *a, dlnode *b)
 
 }
 
+size_t dllist_size(dllist *list)
+{
+    size_t ctr = 0;
+    dlnode *p = NULL;
+    p = list->head;
+    assert(p->next != NULL);
+    while((p = p->next))
+        ctr++;
+    return ctr;
+}
