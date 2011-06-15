@@ -1,15 +1,14 @@
 
-SRC = sllist.c dllist.c 
+include ../Makefile.inc
 
-all: $(SRC) test
-
-test: dllist.o
-	$(CC) $(CFLAGS) -I $(INCFLAGS) dllist.o dllist_test.c -o dllist_test
+all: liblist.a
 
 %.o: %.c
 	$(CC) $(CFLAGS) -I $(INCFLAGS) -fpic -c $? -o $@
 
-include ../Makefile.inc
+liblist.a: $(wildcard *.o)
+	$(AR) rcs liblist.a *.o
+
 .PHONY: all
 .PHONY: count
 .PHONY: clean
