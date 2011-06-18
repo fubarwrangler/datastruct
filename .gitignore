@@ -4,3 +4,4 @@ obj/
 *.depend
 CMakeFiles*
 CMakeCache.txt
+tests/*_test
