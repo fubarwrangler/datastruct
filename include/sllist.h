@@ -20,7 +20,7 @@ linked_list *list_init(void);
 void list_destroy(linked_list *list);
 size_t list_size(linked_list *list);
 list_node *list_get_index(linked_list *list, size_t index);
-list_node *list_create_node(void *data, size_t len);
+list_node *list_create_node(void *data, size_t len, char copy);
 void list_destroy_node(list_node *node);
 linked_list *list_copy(linked_list *list);
 

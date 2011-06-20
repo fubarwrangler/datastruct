@@ -41,45 +41,71 @@ void dllist_destroy(dllist *list)
     }
 }
 
-
-dlnode *dllist_insert_head(dllist *list, dlnode *node)
-{
-    dlnode *p;
-
-    p = list->head;
-    if(p != NULL)
-        p->prev = node;
-    list->head = node;
-    node->prev = NULL;
-    node->next = p;
-    return node->next;
-}
-
-dlnode *dllist_insert_after(dlnode *node, dlnode *newnode)
+dlnode *dllist_insert_head(dllist *list, void *data, size_t len)
 {
     dlnode *p, *q;
 
-    if(node == NULL)
+    p = malloc(sizeof(dlnode));
+    if(p != NULL)
     {
-        fprintf(stderr, "dllist_insert_after: *node is NULL\n");
-        return NULL;
-    }
+        p->len = len;
+        p->prev = NULL;
 
-    if(node->next == NULL)
+        p->data = malloc(len);
+        if(p->data != NULL)
+        {
+            memmove(p->data, data, len);
+            q = list->head;
+            if(q != NULL)
+                q->prev = p;
+            list->head = p;
+            p->next = q;
+        }
+        else
+        {
+            free(p);
+            p = NULL;
+            fprintf(stderr, "Library Error: dllist_insert_head--No memory for data");
+        }
+    }
+    else
+        fprintf(stderr, "Library Error: dllist_insert_head--No memory for new node");
+
+    return p;
+}
+
+dlnode *dllist_insert_after(dlnode *node, void *data, size_t len)
+{
+    dlnode *p = NULL, *q = NULL;
+
+    assert(node != NULL);
+
+    p = malloc(sizeof (dlnode));
+
+    if(p == NULL)
+        fprintf(stderr, "dllist_insert_after: *node is NULL or no Memory\n");
+    else
     {
-        node->next = newnode;
-        newnode->prev = node;
-        newnode->next = NULL;
+        p->data = malloc(len);
+        if(p->data == NULL)
+        {
+            fprintf(stderr, "dllist_insert_after: no memory for new data\n");
+            free(p);
+            p=NULL;
+        }
+        else
+        {
+            memmove(p->data, data, len);
+            p->len = len;
+
+            q = node->next;
+
+            node->next = p;
+            p->prev = node;
+            p->next = q;
+        }
     }
-
-    p = node->next;
-
-    node->next = newnode;
-    newnode->prev = node;
-    newnode->next = p->next;
-    p->prev = newnode;
-
-    return node->next;
+    return p;
 }
 
 dlnode *dllist_create_node(void *data, size_t len)

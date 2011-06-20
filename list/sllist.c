@@ -154,9 +154,10 @@ list_node *list_insert(linked_list *list, list_node *prev, void *data, size_t le
  *  Create a new list_node object containing *data of given size len
  *  @data -- Pointer to data to add to new node
  *  @len -- length of *data
+ *  @copy -- Boolean, 1=make a copy of data, 0=use pointer as given
  *  @return -- New list_node object or NULL on failure
  */
-list_node *list_create_node(void *data, size_t len)
+list_node *list_create_node(void *data, size_t len, char copy)
 {
     list_node *p = NULL;
 
@@ -164,8 +165,22 @@ list_node *list_create_node(void *data, size_t len)
     if(p != NULL)
     {
         p->next = NULL;
-        p->data = data;
         p->len = len;
+        if(!copy)
+            p->data = data;
+        else
+        {
+            p->data = malloc(len);
+            if(p->data == NULL)
+            {
+                fprintf(stderr, "Library error: list_create_node--no memory "
+                                "for new data");
+                free(p);
+                p = NULL;
+            }
+            else
+                memcpy(p->data, data, len);
+        }
     }
     else
     {
@@ -204,7 +219,7 @@ list_node *list_insert_node(linked_list *list, list_node *newnode)
         return NULL;
     }
 
-    newnode->next = list->head->next;
+    newnode->next = list->head;
     list->head = newnode;
 
     return list->head;

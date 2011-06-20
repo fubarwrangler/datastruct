@@ -52,7 +52,7 @@ int main(int argc, char *argv[])
     char tstr[30] = {0};
     int i, n=0;
 
-    if((fp = fopen("data/words.txt", "r")) == NULL)
+    if((fp = fopen("tests/data/words.txt", "r")) == NULL)
     {
         printf("Error opening word file\n");
         return 1;
@@ -92,15 +92,16 @@ int main(int argc, char *argv[])
     printf("Old, with another:\n");
     list_insert_after(words->head->next->next, tstr, strlen(tstr) + 1);
     list_printer(words);
+    p = list_create_node("Manually_insert\0", 15, 1);
+    list_insert_node(words, p);
     printf("Index of NET: %d\n", list_search(words, "NET", myfind));
     printf("Index of net: %d\n", list_search(words, "net", myfind));
 
-    //list_join_after(words->head->next, copy);
     list_join(words, copy);
     printf("After splice: \n");
     list_printer(words);
 
-    printf("12th node here: %s\n", list_get_index(words, 12)->data);
+    printf("12th node here: %s\n", (char *)list_get_index(words, 12)->data);
     p = list_pop_next(list_get_index(words, 11));
     printf("Data from pop'd node: %s\n", p->data);
     list_destroy_node(p);

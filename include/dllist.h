@@ -30,8 +30,8 @@ dlnode *list_insert_head(dllist *list, dlnode *node);
 void dllist_destroy_node(dlnode *node);
 dlnode *dllist_swap(dllist *list, dlnode *a, dlnode *b);
 dlnode *dllist_create_node(void *data, size_t len);
-dlnode *dllist_insert_after(dlnode *node, dlnode *newnode);
-dlnode *dllist_insert_head(dllist *list, dlnode *node);
+dlnode *dllist_insert_after(dlnode *node, void *data, size_t len);
+dlnode *dllist_insert_head(dllist *list, void *data, size_t len);
 
 
 #endif
