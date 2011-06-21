@@ -41,9 +41,11 @@ void dllist_destroy(dllist *list)
     }
 }
 
-dlnode *dllist_insert_head(dllist *list, void *data, size_t len)
+dlnode *dllist_insert(dllist *list, void *data, size_t len)
 {
     dlnode *p, *q;
+
+    assert(list != NULL);
 
     p = malloc(sizeof(dlnode));
     if(p != NULL)
@@ -58,6 +60,8 @@ dlnode *dllist_insert_head(dllist *list, void *data, size_t len)
             q = list->head;
             if(q != NULL)
                 q->prev = p;
+            else
+                list->tail = p;
             list->head = p;
             p->next = q;
         }
@@ -65,20 +69,60 @@ dlnode *dllist_insert_head(dllist *list, void *data, size_t len)
         {
             free(p);
             p = NULL;
-            fprintf(stderr, "Library Error: dllist_insert_head--No memory for data");
+            fprintf(stderr, "Library Error: dllist_insert--No memory for data");
         }
     }
     else
-        fprintf(stderr, "Library Error: dllist_insert_head--No memory for new node");
+        fprintf(stderr, "Library Error: dllist_insert--No memory for new node");
 
     return p;
 }
 
+dlnode *dllist_append(dllist *list, void *data, size_t len)
+{
+    dlnode *p, *q;
+
+    p = malloc(sizeof(dlnode));
+    if(p != NULL)
+    {
+        p->len = len;
+        p->prev = NULL;
+
+        p->data = malloc(len);
+        if(p->data != NULL)
+        {
+            memmove(p->data, data, len);
+            q = list->tail;
+            if(q != NULL)
+                q->next = p;
+            else
+                list->head = p;
+            list->tail = p;
+            p->prev = q;
+        }
+        else
+        {
+            free(p);
+            p = NULL;
+            fprintf(stderr, "Library Error: dllist_append--No memory for data");
+        }
+    }
+    else
+        fprintf(stderr, "Library Error: dllist_append--No memory for new node");
+
+    return p;
+
+}
+
+/* dllist_insert_[before|after]() only for nodes in the middle of the list,
+ * because, otherwise we couldn't update the head/tail pointers in the
+ * containing structure
+ */
 dlnode *dllist_insert_after(dlnode *node, void *data, size_t len)
 {
     dlnode *p = NULL, *q = NULL;
 
-    assert(node != NULL);
+    assert(node->next != NULL);
 
     p = malloc(sizeof (dlnode));
 
@@ -106,6 +150,12 @@ dlnode *dllist_insert_after(dlnode *node, void *data, size_t len)
         }
     }
     return p;
+}
+
+dlnode *dllist_insert_before(dlnode *node, void *data, size_t len)
+{
+    assert(node->prev != NULL);
+    return dllist_insert_after(node->prev, data, len);
 }
 
 dlnode *dllist_create_node(void *data, size_t len)
@@ -140,19 +190,45 @@ void dllist_destroy_node(dlnode *node)
     free(node);
 }
 
-dlnode *dllist_swap(dllist *list, dlnode *a, dlnode *b)
+void dllist_swap(dllist *list, dlnode *n1, dlnode *n2)
 {
     dlnode *p, *q;
 
-    if(a->prev == NULL)
-    {
-        list->head = b;
-        b->prev = NULL;
-        b->next = a->next;
-    }
+    assert(list != NULL && n1 != NULL && n2 != NULL);
 
+    /* Nodes' next pointers, if we get null we know to update list->tail */
+    p = n1->next;
+    if(p != NULL)
+        p->prev = n2;
+    else
+        list->tail = n2;
 
+    n1->next = n2->next;
 
+    q = n2->next;
+    if(q != NULL)
+        q->prev = n1;
+    else
+        list->tail = n1;
+
+    n2->next = p;
+
+    /* Nodes' previous pointers, checking to update list->head as well */
+    p = n1->prev;
+    if(p != NULL)
+        p->next = n2;
+    else
+        list->head = n2;
+
+    n1->prev = n2->prev;
+
+    q = n2->prev;
+    if(q != NULL)
+        q->next = n1;
+    else
+        list->head = n1;
+
+    n2->prev = p;
 }
 
 size_t dllist_size(dllist *list)
@@ -164,4 +240,17 @@ size_t dllist_size(dllist *list)
     while((p = p->next))
         ctr++;
     return ctr;
+}
+
+dlnode *dllist_get_index(dllist *list, size_t idx)
+{
+    dlnode *p;
+    size_t ctr = 0;
+
+    assert(list != NULL);
+
+    p = list->head;
+    while(p && ctr++ < idx)
+        p = p->next;
+    return p;
 }
