@@ -38,6 +38,7 @@ void dllist_destroy(dllist *list)
             p = q;
         }
         free(list);
+        list = NULL;
     }
 }
 
@@ -292,16 +293,49 @@ void dllist_apply_each(dllist *list, void (*fn)(void *))
 
 dllist *dllist_copy(dllist *list)
 {
-    dlnode *p, *q;
+    dlnode *p;
     dllist *newlist;
 
-    newlist = malloc(sizeof list);
-    if(newlist == NULL)
+    newlist = dllist_init();
+    if(newlist != NULL)
     {
-        fprintf(stderr, "Library Error: dllist_copy--no memory for new list\n");
-        return NULL;
+        for(p = list->head; p != NULL; p = p->next)
+        {
+            if(dllist_append(newlist, p->data, p->len) == NULL)
+            {
+                dllist_destroy(newlist);
+                break;
+            }
+        }
     }
-    for(p = list->head; p != NULL && dllist_append(newlist, p->data, p->len) != NULL; p = p->next)
-        ;
+
     return newlist;
+}
+
+dllist *dllist_join(dllist *first, dllist *second)
+{
+    first->tail->next = second->head;
+    second->head->prev = first->tail;
+    first->tail = second->tail;
+    free(second);
+
+    return first;
+}
+
+void dllist_reverse(dllist *list)
+{
+    dlnode *tmp;
+    dlnode *p = list->head;
+
+    /* p points at orig. head */
+    list->head = list->tail;
+    list->tail = p;
+
+    /* assign to p->prev here because it has already been swapped! */
+    for(; p != NULL; p = p->prev)
+    {
+        tmp = p->next;
+        p->next = p->prev;
+        p->prev = tmp;
+    }
 }

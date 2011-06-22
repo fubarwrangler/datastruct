@@ -18,24 +18,85 @@ typedef struct dllist
 } dllist;
 
 
+#define DL_INDEX(l, n) dllist_get_index(l, n)
+
+/**
+ * Create/Destroy a new, empty doubly-linked-list object, returns NULL
+ * on failure to allocate memory.
+ */
 dllist *dllist_init(void);
 void dllist_destroy(dllist *l);
+
+/**
+ * Return the length of the given list, O(n): walks entire list
+ */
 size_t dllist_size(dllist *list);
+
+/**
+ * Create a dlnode structure from *data given, returns NULL on failure / Frees
+ * ->data and then *node itself, setting it to NULL
+ */
 dlnode *dllist_create_node(void *data, size_t len);
 void dllist_destroy_node(dlnode *node);
 
+/**
+ * Return a pointer to a deep copy of *list, or NULL on failure
+ */
+dllist *dllist_copy(dllist *list);
+
+/**
+ * Return the node at index idx, like x = list[idx], also callable as DL_INDEX,
+ * see macro definition.  If idx > len(list), return last node in list.
+ */
 dlnode *dllist_get_index(dllist *list, size_t idx);
 
+/**
+ * Swap two nodes *n1 and *n2 in *list, updating list->head/tail as needed
+ */
 void dllist_swap(dllist *list, dlnode *n1, dlnode *n2);
+
+/**
+ * Insert a new node with a copy of *data before or after the given *node, but
+ * not if the node before/after *node is the head/tail of the list, because
+ * although we could do it for after, we would lose the ability to track the
+ * list's tail
+ */
 dlnode *dllist_insert_after(dlnode *node, void *data, size_t len);
 dlnode *dllist_insert_before(dlnode *node, void *data, size_t len);
+
+/**
+ * Insert a node with a copy of *data at the begenning of *list, returns
+ * pointer to new node, or NULL on failure
+ */
 dlnode *dllist_insert(dllist *list, void *data, size_t len);
+
+/**
+ * Makes a new node with a copy of *data and appends it to the end of *list.
+ * Returns a pointer to the new node or NULL on failure
+ */
 dlnode *dllist_append(dllist *list, void *data, size_t len);
+
+/**
+ * Delete *node from *list, updating ->head / ->tail as necessary
+ */
 void dllist_delete(dllist *list, dlnode *node);
 
+/**
+ * Apply the function pointed to by (*fn) that takes a pointer to a ->data
+ * element and (presumably) does something to it to each element of *list.
+ */
 void dllist_apply_each(dllist *list, void (*fn)(void *));
 
+/**
+ * Join two lists, *second onto the end of *first, freeing the memory for
+ * *second as it is no longer needed (the controlling structure).  Modifies
+ * first->tail to point at new tail, returns pointer to single list.
+ */
+dllist *dllist_join(dllist *first, dllist *second);
 
-#define DL_INDEX(l, n) dllist_get_index(l, n)
+/**
+ * Reverse list in place.
+ */
+void dllist_reverse(dllist *list);
 
 #endif

@@ -14,6 +14,7 @@
 				<Option compiler="gcc" />
 				<Option createDefFile="1" />
 				<Compiler>
+					<Add option="-O2" />
 					<Add option="-fPIC" />
 				</Compiler>
 			</Target>
@@ -46,6 +47,7 @@
 			<Add alias="tests" targets="sllist_test;dllist_test;" />
 		</VirtualTargets>
 		<Compiler>
+			<Add option="-march=core2" />
 			<Add option="-Wall" />
 			<Add directory="/home/willsk/git/datastruct/include" />
 		</Compiler>
@@ -77,6 +79,7 @@
 			<code_completion />
 			<debugger />
 			<lib_finder disable_auto="1" />
+			<envvars />
 		</Extensions>
 	</Project>
 </CodeBlocks_project_file>

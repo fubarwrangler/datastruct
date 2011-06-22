@@ -47,7 +47,7 @@ int main(int argc, char *argv[])
 {
     FILE *fp;
     char tmp[512];
-    dllist *words;
+    dllist *words, *copy;
 //    dlnode *p = NULL;
     int i, n=0;
 
@@ -64,7 +64,7 @@ int main(int argc, char *argv[])
     {
         i = strlen(tmp);
         tmp[i - 1] = '\0';
-        dllist_insert(words, tmp, i);
+        dllist_append(words, tmp, i);
     }
 
     fclose(fp);
@@ -72,15 +72,24 @@ int main(int argc, char *argv[])
     printf("List has %ld elements\n", dllist_size(words));
     list_printer(words);
 
+    copy = dllist_copy(words);
     dllist_swap(words, DL_INDEX(words, 0), DL_INDEX(words, 6));
 
     printf("\nAfter swap & delete:\n");
     dllist_delete(words, words->tail->prev);
-    dllist_apply_each(words, &myupper);
     list_printer(words);
 
 
+    dllist_apply_each(copy, myupper);
+    printf("Copy made uppercase: \n");
+    words = dllist_join(copy, words);
+    list_printer(copy);
+    printf("Orig reversed:\n");
+    dllist_reverse(words);
+    list_printer(words);
+
     dllist_destroy(words);
+    //dllist_destroy(copy);
 
     return 0;
 }
