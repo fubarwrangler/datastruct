@@ -111,7 +111,6 @@ dlnode *dllist_append(dllist *list, void *data, size_t len)
         fprintf(stderr, "Library Error: dllist_append--No memory for new node");
 
     return p;
-
 }
 
 /* dllist_insert_[before|after]() only for nodes in the middle of the list,
@@ -188,6 +187,7 @@ void dllist_destroy_node(dlnode *node)
 {
     free(node->data);
     free(node);
+    node = NULL;
 }
 
 void dllist_swap(dllist *list, dlnode *n1, dlnode *n2)
@@ -234,11 +234,13 @@ void dllist_swap(dllist *list, dlnode *n1, dlnode *n2)
 size_t dllist_size(dllist *list)
 {
     size_t ctr = 0;
-    dlnode *p = NULL;
-    p = list->head;
-    assert(p->next != NULL);
-    while((p = p->next))
-        ctr++;
+    dlnode *p = list->head;;
+
+    if(p != NULL)
+    {
+        while((p = p->next))
+            ctr++;
+    }
     return ctr;
 }
 
@@ -253,4 +255,53 @@ dlnode *dllist_get_index(dllist *list, size_t idx)
     while(p && ctr++ < idx)
         p = p->next;
     return p;
+}
+
+void dllist_delete(dllist *list, dlnode *node)
+{
+    assert(list != NULL && node != NULL);
+
+    if(node == list->head)
+    {
+        list->head = node->next;
+        node->next->prev = NULL;
+    }
+    else if(node == list->tail)
+    {
+        list->tail = node->prev;
+        node->prev->next = NULL;
+    }
+    else
+    {
+        node->prev->next = node->next;
+        node->next->prev = node->prev;
+    }
+    dllist_destroy_node(node);
+}
+
+void dllist_apply_each(dllist *list, void (*fn)(void *))
+{
+    dlnode *p = list->head;
+
+    while(p != NULL)
+    {
+        (*fn)(p->data);
+        p = p->next;
+    }
+}
+
+dllist *dllist_copy(dllist *list)
+{
+    dlnode *p, *q;
+    dllist *newlist;
+
+    newlist = malloc(sizeof list);
+    if(newlist == NULL)
+    {
+        fprintf(stderr, "Library Error: dllist_copy--no memory for new list\n");
+        return NULL;
+    }
+    for(p = list->head; p != NULL && dllist_append(newlist, p->data, p->len) != NULL; p = p->next)
+        ;
+    return newlist;
 }

@@ -30,8 +30,11 @@ void dllist_swap(dllist *list, dlnode *n1, dlnode *n2);
 dlnode *dllist_insert_after(dlnode *node, void *data, size_t len);
 dlnode *dllist_insert_before(dlnode *node, void *data, size_t len);
 dlnode *dllist_insert(dllist *list, void *data, size_t len);
-
 dlnode *dllist_append(dllist *list, void *data, size_t len);
+void dllist_delete(dllist *list, dlnode *node);
+
+void dllist_apply_each(dllist *list, void (*fn)(void *));
+
 
 #define DL_INDEX(l, n) dllist_get_index(l, n)
 

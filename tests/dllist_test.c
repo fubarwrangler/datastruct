@@ -5,6 +5,28 @@
 
 #include "dllist.h"
 
+void myupper(void *str)
+{
+    char *p;
+    p = str;
+    do
+        *p = toupper(*p);
+    while(*p++);
+}
+
+void *myprinter(void *str)
+{
+    printf("%s\n", (char *)str);
+    return str;
+}
+
+int myfind(void *data, void *str)
+{
+    if(strcmp((char *)data, (char *)str) == 0)
+        return 1;
+    else
+        return 0;
+}
 
 void list_printer(dllist *lst)
 {
@@ -26,7 +48,7 @@ int main(int argc, char *argv[])
     FILE *fp;
     char tmp[512];
     dllist *words;
-    dlnode *p = NULL;
+//    dlnode *p = NULL;
     int i, n=0;
 
     if((fp = fopen("tests/data/words.txt", "r")) == NULL)
@@ -37,8 +59,7 @@ int main(int argc, char *argv[])
 
     words = dllist_init();
 
-    dllist_append(words, "What", 5);
-    p = words->head;
+    //dllist_append(words, "What", 5);
     while((fgets(tmp, 512, fp)) != NULL && n++ < 20)
     {
         i = strlen(tmp);
@@ -48,17 +69,19 @@ int main(int argc, char *argv[])
 
     fclose(fp);
 
-
-    //list_printer(words);
     printf("List has %ld elements\n", dllist_size(words));
     list_printer(words);
 
-    dllist_swap(words, DL_INDEX(words, 0), DL_INDEX(words, 1));
+    dllist_swap(words, DL_INDEX(words, 0), DL_INDEX(words, 6));
 
-    printf("\nAfter swap: \n");
+    printf("\nAfter swap & delete:\n");
+    dllist_delete(words, words->tail->prev);
+    dllist_apply_each(words, &myupper);
     list_printer(words);
+
 
     dllist_destroy(words);
 
     return 0;
 }
+
