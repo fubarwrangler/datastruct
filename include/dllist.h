@@ -1,6 +1,8 @@
 #ifndef _DLLIST_H
 #define _DLLIST_H
 
+#define SEARCH_START_HEAD 0
+#define SEARCH_START_TAIL 1
 
 typedef struct node
 {
@@ -98,5 +100,17 @@ dllist *dllist_join(dllist *first, dllist *second);
  * Reverse list in place.
  */
 void dllist_reverse(dllist *list);
+
+/**
+ * Search the list sequentially for value, using (*cmp) to test equality, which
+ * returns nonzero for not equal, 0 otherwise. Returns node where value is
+ * found, or NULL if it isn't.
+ */
+dlnode *dllist_search(dllist *list, void *value, int (*cmp)(void *a, void *b));
+
+/**
+ * Return the index of the first appearence of given *value, -1 on not-found
+ */
+long dllist_find_index(dllist *list, void *value, int (*cmp)(void *, void *));
 
 #endif

@@ -85,9 +85,12 @@ int main(int argc, char *argv[])
     words = dllist_join(copy, words);
     list_printer(copy);
     printf("Orig reversed:\n");
+
     dllist_reverse(words);
     list_printer(words);
 
+    printf("Address of 'net': %p\n", dllist_search(words, "net", myfind));
+    printf("Index of 'LOOK': %ld\n", dllist_find_index(words, "LOOK", myfind));
     dllist_destroy(words);
     //dllist_destroy(copy);
 

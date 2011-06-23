@@ -317,8 +317,8 @@ dllist *dllist_join(dllist *first, dllist *second)
     first->tail->next = second->head;
     second->head->prev = first->tail;
     first->tail = second->tail;
-    free(second);
-
+    second->head = NULL;
+    second->tail = NULL;
     return first;
 }
 
@@ -338,4 +338,30 @@ void dllist_reverse(dllist *list)
         p->next = p->prev;
         p->prev = tmp;
     }
+}
+
+
+dlnode *dllist_search(dllist *list, void *value, int (*cmp)(void *a, void *b))
+{
+    dlnode *p;
+
+    for(p = list->head; p != NULL && !cmp(value, p->data); p = p->next)
+        ;
+
+    return p;
+}
+
+
+long dllist_find_index(dllist *list, void *value, int (*cmp)(void *, void *))
+{
+    dlnode *p = list->head;
+    long i = 0, result = -1;
+
+    while(p != NULL && result < 0)
+    {
+        if(cmp(value, p->data))
+            result = i;
+        i++; p = p->next;
+    }
+    return result;
 }
