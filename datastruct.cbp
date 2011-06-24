@@ -41,10 +41,19 @@
 					<Add directory="/home/willsk/git/datastruct/" />
 				</Linker>
 			</Target>
+			<Target title="stack_test">
+				<Option output="tests/stack_test" prefix_auto="1" extension_auto="1" />
+				<Option type="1" />
+				<Option compiler="gcc" />
+				<Option use_console_runner="0" />
+				<Compiler>
+					<Add option="-std=c99" />
+				</Compiler>
+			</Target>
 		</Build>
 		<VirtualTargets>
-			<Add alias="all" targets="list;sllist_test;dllist_test;" />
-			<Add alias="tests" targets="sllist_test;dllist_test;" />
+			<Add alias="all" targets="list;sllist_test;dllist_test;stack_test;" />
+			<Add alias="tests" targets="sllist_test;dllist_test;stack_test;" />
 		</VirtualTargets>
 		<Compiler>
 			<Add option="-march=core2" />
@@ -57,6 +66,11 @@
 		<Unit filename="include/sllist.h">
 			<Option target="&lt;{~None~}&gt;" />
 		</Unit>
+		<Unit filename="include/stack.h">
+			<Option target="list" />
+			<Option target="sllist_test" />
+			<Option target="dllist_test" />
+		</Unit>
 		<Unit filename="list/dllist.c">
 			<Option compilerVar="CC" />
 			<Option target="list" />
@@ -66,6 +80,7 @@
 			<Option compilerVar="CC" />
 			<Option target="list" />
 			<Option target="sllist_test" />
+			<Option target="stack_test" />
 		</Unit>
 		<Unit filename="tests/dllist_test.c">
 			<Option compilerVar="CC" />
@@ -74,6 +89,10 @@
 		<Unit filename="tests/sllist_test.c">
 			<Option compilerVar="CC" />
 			<Option target="sllist_test" />
+		</Unit>
+		<Unit filename="tests/stack_test.c">
+			<Option compilerVar="CC" />
+			<Option target="stack_test" />
 		</Unit>
 		<Extensions>
 			<code_completion />

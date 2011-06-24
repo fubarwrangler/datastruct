@@ -291,6 +291,22 @@ list_node *list_pop_next(list_node *node)
 }
 
 /**
+ * list_pop_head()
+ *  Remove the head node and return it
+ *
+ * @node -- Pointer to list
+ * @return -- A pointer to the former head
+ */
+list_node *list_pop_head(linked_list *list)
+{
+    list_node *p = list->head;
+
+    if(p != NULL)
+        list->head = p->next;
+    return p;
+}
+
+/**
  * list_get_index()
  *  Get the node at index (index = 0 is list->head, 1 is head->next, etc...)
  *

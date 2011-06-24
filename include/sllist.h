@@ -32,6 +32,7 @@ list_node *list_insert(linked_list *list, list_node *prev, void *data, size_t le
 list_node *list_insert_after(list_node *prev, void *data, size_t len);
 list_node *list_insert_node(linked_list *list, list_node *newnode);
 list_node *list_pop_next(list_node *node);
+list_node *list_pop_head(linked_list *list);
 
 
 /* List modification functions */
