@@ -28,6 +28,11 @@ int myfind(void *data, void *str)
         return 0;
 }
 
+int mycmp(void *a, void *b)
+{
+    return strcmp((char *)a, (char *)b);
+}
+
 void list_printer(dllist *lst)
 {
     dlnode *p = lst->head;
@@ -70,9 +75,10 @@ int main(int argc, char *argv[])
     fclose(fp);
 
     printf("List has %ld elements\n", dllist_size(words));
+    dllist_sort(words, mycmp);
     list_printer(words);
 
-    copy = dllist_copy(words);
+/*    copy = dllist_copy(words);
     dllist_swap(words, DL_INDEX(words, 0), DL_INDEX(words, 6));
 
     printf("\nAfter swap & delete:\n");
@@ -91,6 +97,7 @@ int main(int argc, char *argv[])
 
     printf("Address of 'net': %p\n", dllist_search(words, "net", myfind));
     printf("Index of 'LOOK': %ld\n", dllist_find_index(words, "LOOK", myfind));
+    */
     dllist_destroy(words);
     //dllist_destroy(copy);
 

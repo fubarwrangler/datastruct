@@ -113,4 +113,7 @@ dlnode *dllist_search(dllist *list, void *value, int (*cmp)(void *a, void *b));
  */
 long dllist_find_index(dllist *list, void *value, int (*cmp)(void *, void *));
 
+void dllist_sort(dllist *list, int (*cmp_fn)(void *, void *));
+
+
 #endif

@@ -365,3 +365,37 @@ long dllist_find_index(dllist *list, void *value, int (*cmp)(void *, void *))
     }
     return result;
 }
+
+void do_sort(dllist *list, int low, int high, int (*cmp_fn)(void *, void *))
+{
+    int i = (high - low) / 2, j = high;
+    dlnode *pivot, *n, *m;
+
+    pivot = dllist_get_index(list, (high - low) / 2);
+    n = dllist_get_index(list, low);
+    m = pivot;
+    dllist_swap(list, n, pivot);
+
+    while(i <= j)
+    {
+        while(cmp_fn(pivot->data, n->data) <= 0 && i <= high)
+        {
+            i++;
+            n = n->next;
+        }
+        while(cmp_fn(m->data, n->data) > 0 && j > low)
+        {
+            j--;
+            m = m->prev;
+        }
+        if(i < j)
+            dllist_swap(list, n, pivot);
+    }
+    dllist_swap(list, dllist_get_index(list, low), dllist_get_index(list, j));
+}
+
+void dllist_sort(dllist *list, int (*cmp_fn)(void *, void *))
+{
+    if(list->head != NULL && list->tail != list->head)
+        do_sort(list, 0, dllist_size(list), cmp_fn);
+}
