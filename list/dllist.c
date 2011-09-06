@@ -366,32 +366,56 @@ long dllist_find_index(dllist *list, void *value, int (*cmp)(void *, void *))
     return result;
 }
 
+void lst_printer(dllist *lst, int low, int high)
+{
+    dlnode *p = dllist_get_index(lst, low);
+    int ctr=low;
+
+    while(ctr < high)
+    {
+        printf("%p: (%2d) %s (%ld) (prev -> %p) (next -> %p)\n",
+               p, ctr++, (char *)p->data, p->len, p->prev, p->next);
+        p = p->next;
+    }
+}
+
 void do_sort(dllist *list, int low, int high, int (*cmp_fn)(void *, void *))
 {
-    int i = (high - low) / 2, j = high;
+    int i, j;
     dlnode *pivot, *n, *m;
+    void *pivot_data;
+    lst_printer(list, low, high);
 
-    pivot = dllist_get_index(list, (high - low) / 2);
-    n = dllist_get_index(list, low);
-    m = pivot;
-    dllist_swap(list, n, pivot);
-
-    while(i <= j)
+    if(low < high - 1)
     {
-        while(cmp_fn(pivot->data, n->data) <= 0 && i <= high)
+        m = dllist_get_index(list, (high - low) / 2);
+        pivot_data = m->data;
+        n = dllist_get_index(list, high);
+        dllist_swap(list, m, n);
+        printf("pivot: %s\n", pivot_data);
+        m = n = dllist_get_index(list, low);
+
+        for(i = low; i < high; i++)
         {
-            i++;
+            printf("At: %s...", n->data);
+            printf("cmp %s w/ %s: %d...", n->data, pivot_data, cmp_fn(n->data, pivot_data));
+            if(cmp_fn(n->data, pivot_data) < 0)
+            {
+                printf("Swap with %s\n", m->data);
+                dllist_swap(list, n, m);
+                pivot = m;
+                m = n->next;
+                n = pivot;
+            }
+            else
+                printf("Skip\n");
             n = n->next;
         }
-        while(cmp_fn(m->data, n->data) > 0 && j > low)
-        {
-            j--;
-            m = m->prev;
-        }
-        if(i < j)
-            dllist_swap(list, n, pivot);
+        n = dllist_get_index(list, high);
+        dllist_swap(list, m, n);
+        do_sort(list, low, (high-low) / 2, cmp_fn);
+        do_sort(list, (high-low) / 2, high, cmp_fn);
     }
-    dllist_swap(list, dllist_get_index(list, low), dllist_get_index(list, j));
 }
 
 void dllist_sort(dllist *list, int (*cmp_fn)(void *, void *))

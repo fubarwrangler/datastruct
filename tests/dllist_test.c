@@ -54,7 +54,8 @@ int main(int argc, char *argv[])
     char tmp[512];
     dllist *words, *copy;
 //    dlnode *p = NULL;
-    int i, n=0;
+    dlnode *m, *n;
+    int i, j=0;
 
     if((fp = fopen("tests/data/words.txt", "r")) == NULL)
     {
@@ -65,7 +66,7 @@ int main(int argc, char *argv[])
     words = dllist_init();
 
     //dllist_append(words, "What", 5);
-    while((fgets(tmp, 512, fp)) != NULL && n++ < 20)
+    while((fgets(tmp, 512, fp)) != NULL && j++ < 20)
     {
         i = strlen(tmp);
         tmp[i - 1] = '\0';
@@ -74,12 +75,15 @@ int main(int argc, char *argv[])
 
     fclose(fp);
 
+    m = dllist_get_index(words, 2);
+    n = dllist_get_index(words, 7);
     printf("List has %ld elements\n", dllist_size(words));
+    //list_printer(words);
     dllist_sort(words, mycmp);
     list_printer(words);
 
 /*    copy = dllist_copy(words);
-    dllist_swap(words, DL_INDEX(words, 0), DL_INDEX(words, 6));
+    (words, DL_INDEX(words, 0), DL_INDEX(words, 6));
 
     printf("\nAfter swap & delete:\n");
     dllist_delete(words, words->tail->prev);
