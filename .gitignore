@@ -1,7 +1,8 @@
-bin/
-obj/
-*.layout
-*.depend
 CMakeFiles*
 CMakeCache.txt
 tests/*_test
+*.kdev*
+Makefile
+cmake_install.cmake
+*.so
+*.a

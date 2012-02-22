@@ -7,12 +7,13 @@
 int main(int argc, char *argv[])
 {
     char *values[] = {"Wisconsin", "Ohio", "Minnesota", "Kentucky"};
+    int i;
     stack *stk;
     stack_item *p;
 
     stk = stack_init();
 
-    for(int i = 0; i < 4; i++)
+    for(i = 0; i < 4; i++)
         stack_push(stk, values[i], strlen(values[i]));
 
     printf("Peek: %s\n", stack_peek(stk));

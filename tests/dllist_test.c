@@ -57,7 +57,7 @@ int main(int argc, char *argv[])
     dlnode *m, *n;
     int i, j=0;
 
-    if((fp = fopen("tests/data/words.txt", "r")) == NULL)
+    if((fp = fopen("data/words.txt", "r")) == NULL)
     {
         printf("Error opening word file\n");
         return 1;
