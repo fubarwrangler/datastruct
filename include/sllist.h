@@ -1,11 +1,11 @@
 #ifndef _SLLIST_H
 #define _SLLIST_H
 
-typedef struct llnode
+typedef struct _llnode
 {
     void *data;
     size_t len;
-    struct llnode *next;
+    struct _llnode *next;
 }list_node;
 
 

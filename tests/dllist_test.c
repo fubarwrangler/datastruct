@@ -79,10 +79,9 @@ int main(int argc, char *argv[])
     n = dllist_get_index(words, 7);
     printf("List has %ld elements\n", dllist_size(words));
     //list_printer(words);
-    dllist_sort(words, mycmp);
     list_printer(words);
 
-/*    copy = dllist_copy(words);
+    copy = dllist_copy(words);
     (words, DL_INDEX(words, 0), DL_INDEX(words, 6));
 
     printf("\nAfter swap & delete:\n");
@@ -101,9 +100,8 @@ int main(int argc, char *argv[])
 
     printf("Address of 'net': %p\n", dllist_search(words, "net", myfind));
     printf("Index of 'LOOK': %ld\n", dllist_find_index(words, "LOOK", myfind));
-    */
     dllist_destroy(words);
-    //dllist_destroy(copy);
+    dllist_destroy(copy);
 
     return 0;
 }

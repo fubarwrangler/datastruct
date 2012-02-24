@@ -361,11 +361,9 @@ linked_list *list_apply_each(linked_list *list, void *(*fn)(void *))
     }
 
     p = list->head;
-    while(p)
-    {
-        list_apply(p, fn);
-        p = p->next;
-    }
+    while((p = list_apply(p, fn)) != NULL)
+		; /* Do nothing */
+
     return list;
 }
 
@@ -516,7 +514,6 @@ linked_list *list_copy(linked_list *list)
                 list_destroy(newlist);
                 newlist = NULL;
             }
-
         }
     }
 
