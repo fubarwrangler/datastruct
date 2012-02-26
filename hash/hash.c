@@ -11,11 +11,12 @@ hash_table *hash_init(hash_fn_t hash_fn)
 	hash_table *h = malloc(sizeof(hash_table));
 
 	if(h != NULL)	{
-		
+
 		h->hash_fn = (hash_fn == NULL) ? &default_hash_fn : hash_fn;
 		h->size = INIT_HASH_TBL_SIZE;
 		h->buckets = malloc(h->size * sizeof(bucket_data *));
 		h->nelm = 0;
+		h->autofree = 0;
 		if(h->buckets != NULL) {
 			for(i = 0; i < h->size; i++)
 				h->buckets[i] = NULL;
@@ -29,28 +30,29 @@ hash_table *hash_init(hash_fn_t hash_fn)
 
 
 /* XXX: NOT DONE -- must free buckets too */
-void hash_destroy(hash_table *h)
+void hash_destroy(hash_table *h, int freedata)
 {
 	if(h!=NULL)	{
 		if(h->buckets != NULL)	{
 			bucket_data *b, *nb;
 			int i;
-			
+
 			for(i = 0; i < h->size; i++)	{
 				b = h->buckets[i];
 				while(b != NULL)	{
 					nb = b->next;
 					free(b->key);
+					if(freedata)
+						free(b->data);
 					free(b);
 					b = nb;
 				}
-			}				
+			}
 			free(h->buckets);
 		}
 		free(h);
 	}
 }
-
 
 int hash_insert(hash_table *h, const char *key, void *data)
 {
@@ -60,9 +62,11 @@ int hash_insert(hash_table *h, const char *key, void *data)
 	b = h->buckets[idx];
 	printf("New in chain at %d\n", idx);
 
-	
+
 	while(b != NULL)	{
 		if(strcmp(b->key, key) == 0)	{
+			if(h->autofree)
+				free(b->data);
 			b->data = data;
 			return 0;
 		}
@@ -72,11 +76,14 @@ int hash_insert(hash_table *h, const char *key, void *data)
 
 	if((b = malloc(sizeof(bucket_data))) == NULL)
 		return 1;
-	
-	if((b->key = strdup(key)) == NULL)
+
+	if((b->key = strdup(key)) == NULL)	{
+		free(b);
 		return 1;
-	
+	}
+
 	b->data = data;
+
 	if(pb != NULL)
 		pb->next = b;
 	else
@@ -85,3 +92,39 @@ int hash_insert(hash_table *h, const char *key, void *data)
 
 	return 0;
 }
+
+
+int hash_insert_string(hash_table *h, const char *key, char *val)
+{
+	char *n;
+
+	if((n = strdup(val)) == NULL)
+		return 1;
+
+	if(hash_insert(h, key, n) != 0)	{
+		free(n);
+		return 1;
+	}
+
+	return 0;
+}
+
+
+void *hash_get(hash_table *h, const char *key)
+{
+	bucket_data *b = h->buckets[h->hash_fn(key) % h->size];
+
+	while(b != NULL)	{
+		if(strcmp(b->key, key) == 0)
+			return b->data;
+		b = b->next;
+	}
+	return NULL;
+}
+
+
+
+
+
+
+
