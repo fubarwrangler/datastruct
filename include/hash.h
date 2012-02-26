@@ -1,34 +1,36 @@
 #ifndef HASH_H__
 #define HASH_H__
 
+#include <stddef.h>
+
 #define INIT_HASH_TBL_SIZE 16
 
 
-typedef unsigned int (*hash_fn_t)(char *, int);
+typedef unsigned int (*hash_fn_t)(const char *);
 
 typedef struct _bucket_data
 {
 	char *key;
-	size_t keylen;
 	void *data;
-	size_t datalen;
 	struct _bucket_data *next;
 
 } bucket_data;
 
 typedef struct _hash_table {
-	int n_buckets;
+	size_t size;
+	size_t nelm;
 	bucket_data **buckets;
 	hash_fn_t hash_fn;
 } hash_table;
 
 
-unsigned int default_hash_fn(char *key, int len)
+unsigned int default_hash_fn(const char *key)
 {
-    unsigned int hash, i;
-    for(hash = i = 0; i < len; ++i)
+    unsigned int hash = 0;
+	
+    while(*key)
     {
-        hash += key[i];
+        hash += *key++;
         hash += (hash << 10);
         hash ^= (hash >> 6);
     }
@@ -57,9 +59,7 @@ hash_table *hash_init(hash_fn_t hash_fn);
 void hash_destroy(hash_table *h);
 
 
-int hash_insert(hash_table *h,
-				char* key, size_t k_len,
-				char* data, size_t d_len);
+int hash_insert(hash_table* h, const char* key, void* data);
 
 
 #endif /* HASH_H__ */
