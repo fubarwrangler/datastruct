@@ -6,3 +6,4 @@ include_directories(include)
 
 add_subdirectory(list)
 add_subdirectory(tests)
+add_subdirectory(hash)

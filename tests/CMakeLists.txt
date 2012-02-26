@@ -10,3 +10,6 @@ target_link_libraries(stack_test llist)
 
 #add_executable(queue_test queue_test.c)
 #target_link_libraries(queue_test llist)
+
+add_executable(hash_test hash_test.c)
+target_link_libraries(hash_test hash)
