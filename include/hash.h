@@ -3,7 +3,7 @@
 
 #include <stddef.h>
 
-#define INIT_HASH_TBL_SIZE 160
+#define INIT_HASH_TBL_SIZE 10
 
 /* Hash function type -- maps strings to unsigned ints */
 typedef unsigned int (*hash_fn_t)(const char *);
@@ -17,11 +17,11 @@ typedef struct _bucket_data
 } bucket_data;
 
 typedef struct _hash_table {
-	size_t size;
-	size_t nelm;
+	size_t size;	/* Number of buckets */
+	size_t nelm;	/* Number of elements in hash table */
+	int autofree;	/* Bool flag if we call free() on bucket->data */
 	bucket_data **buckets;
 	hash_fn_t hash_fn;
-	int autofree;
 } hash_table;
 
 /**
@@ -68,7 +68,7 @@ hash_table *hash_init(hash_fn_t hash_fn);
  *
  * @h: hash table to free
  */
-void hash_destroy(hash_table *h, int freedata);
+void hash_destroy(hash_table *h);
 
 /**
  * hash_insert() -- insert a key/data pair into a hash table
@@ -100,6 +100,15 @@ int hash_insert_string(hash_table *h, const char *key, char *val);
  * Returns: the data corresponding to @key, or NULL if not present
  */
 void *hash_get(hash_table *h, const char *key);
+
+/**
+ * hash_delete() -- remove key from hash table
+ *  @h: hash table to delete from
+ *  @key: key to remove
+ *
+ * Returns: 0 on successful delete, 1 on key-not-found
+ */
+int hash_delete(hash_table *h, const char *key);
 
 
 #endif /* HASH_H__ */

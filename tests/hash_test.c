@@ -69,18 +69,17 @@ int main(int argc, char const *argv[])
 	hash_insert_string(hash, "What", "CRASH!");
 
 
-
-
 	printf("1. %s\n", hash_get(hash, "California"));
 	printf("2. %s\n", hash_get(hash, "Wut"));
 
 
 	fill_words(hash, "data/words.txt");
-	hash_insert_string(hash, "look", "overwritten");
 	hash_insert_string(hash, "woodland", "creatures");
+	hash_insert_string(hash, "look", "overwritten");
 	print_hash(hash);
-
-	hash_destroy(hash, 1);
+	hash_delete(hash, "piqued");
+	print_hash(hash);
+	hash_destroy(hash);
 
 	return 0;
 }

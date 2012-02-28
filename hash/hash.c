@@ -30,7 +30,7 @@ hash_table *hash_init(hash_fn_t hash_fn)
 
 
 /* XXX: NOT DONE -- must free buckets too */
-void hash_destroy(hash_table *h, int freedata)
+void hash_destroy(hash_table *h)
 {
 	if(h!=NULL)	{
 		if(h->buckets != NULL)	{
@@ -42,7 +42,7 @@ void hash_destroy(hash_table *h, int freedata)
 				while(b != NULL)	{
 					nb = b->next;
 					free(b->key);
-					if(freedata)
+					if(h->autofree)
 						free(b->data);
 					free(b);
 					b = nb;
@@ -122,8 +122,31 @@ void *hash_get(hash_table *h, const char *key)
 	return NULL;
 }
 
+int hash_delete(hash_table *h, const char *key)
+{
+	unsigned int idx = h->hash_fn(key) % h->size;
+	bucket_data *b = h->buckets[idx];
+	bucket_data *pb = NULL;
 
+	while(b != NULL)	{
+		if(strcmp(b->key, key) == 0)	{
+			if(pb == NULL)
+				h->buckets[idx] = b->next;
+			else
+				pb->next = b->next;
 
+			if(h->autofree)
+				free(b->data);
+			free(b->key);
+			free(b);
+			h->nelm--;
+			return 0;
+		}
+		pb = b;
+		b = b->next;
+	}
+	return 1;
+}
 
 
 
