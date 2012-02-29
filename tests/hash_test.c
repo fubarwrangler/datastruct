@@ -14,11 +14,18 @@ void print_hash(hash_table *h)
 	for(i=0; i<h->size; i++)	{
 		printf("Bucket %d: %p (%p)", i, h->buckets[i], &h->buckets[i]);
 		if(h->buckets[i])	{
+			int j = 0;
 			bucket_data *b = h->buckets[i];
 			while(b) {
-				printf("\n  %s => (%p) (%s) (next %p)", b->key, b->data, (char *)b->data, b->next);
+				j++;
+				if(j < 4 || b->next == NULL)
+					printf("\n  %s => (%p) (%s) (next %p)", b->key, b->data, (char *)b->data, b->next);
+				else if(j == 4 && b->next != NULL)
+					printf("\n  ...");
 				b = b->next;
 			}
+			if(j > 4)
+				printf("\n%d skipped", j - 4);
 		}
 		putchar('\n');
 	}
@@ -77,10 +84,21 @@ int main(int argc, char const *argv[])
 	hash_insert_string(hash, "woodland", "creatures");
 	hash_insert_string(hash, "look", "overwritten");
 	print_hash(hash);
-	hash_delete(hash, "piqued");
-	print_hash(hash);
-	hash_destroy(hash);
 
+	hash_resize(hash, 4);
+
+	print_hash(hash);
+
+	hash_resize(hash, 75);
+
+	print_hash(hash);
+
+	hash_resize(hash, 16);
+
+	print_hash(hash);
+
+	
+	hash_destroy(hash);
 	return 0;
 }
 

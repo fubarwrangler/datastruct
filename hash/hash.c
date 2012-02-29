@@ -7,23 +7,20 @@
 
 hash_table *hash_init(hash_fn_t hash_fn)
 {
-	int i, j;
 	hash_table *h = malloc(sizeof(hash_table));
 
 	if(h != NULL)	{
-
+		/* Did we supply a hash function? */
 		h->hash_fn = (hash_fn == NULL) ? &default_hash_fn : hash_fn;
+		/* TODO: make this a parameter? */
 		h->size = INIT_HASH_TBL_SIZE;
-		h->buckets = malloc(h->size * sizeof(bucket_data *));
 		h->nelm = 0;
 		h->autofree = 0;
-		if(h->buckets != NULL) {
-			for(i = 0; i < h->size; i++)
-				h->buckets[i] = NULL;
+		h->buckets = calloc(h->size, sizeof(bucket_data *));
+		if(h->buckets != NULL)
 			return h;
-		} else {
+		else
 			free(h);
-		}
 	}
 	return NULL;
 }
@@ -60,8 +57,6 @@ int hash_insert(hash_table *h, const char *key, void *data)
 	unsigned int idx = h->hash_fn(key) % h->size;
 
 	b = h->buckets[idx];
-	printf("New in chain at %d\n", idx);
-
 
 	while(b != NULL)	{
 		if(strcmp(b->key, key) == 0)	{
@@ -149,5 +144,41 @@ int hash_delete(hash_table *h, const char *key)
 }
 
 
+int hash_resize(hash_table *h, size_t newsize)
+{
+	bucket_data **newbuckets;
+	bucket_data *b, *target, *prev, *next;
+	int i, j;
+
+	if((newbuckets = calloc(newsize, sizeof(bucket_data *))) == NULL)
+		return 1;
+	for(i = 0; i < h->size; i++)	{
+		b = h->buckets[i];
+		while(b)	{
+			unsigned int idx = h->hash_fn(b->key) % newsize;
+			next = b->next;
+
+			if(newbuckets[idx] == NULL)	{
+				newbuckets[idx] = b;
+				b->next = NULL;
+			} else {
+				target = newbuckets[idx];
+				while(target) {
+					prev = target;
+					target = target->next;
+				}
+				prev->next = b;
+				b->next = NULL;
+			}
+
+			b = next;
+		}
+	}
+	free(h->buckets);
+	h->buckets = newbuckets;
+	h->size = newsize;
+
+	return 0;
+}
 
 

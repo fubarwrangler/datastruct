@@ -111,4 +111,14 @@ void *hash_get(hash_table *h, const char *key);
 int hash_delete(hash_table *h, const char *key);
 
 
+/**
+ * hash_resize() -- resize a hash table, rehashing all keys into new buckets
+ *  @h: hash table
+ *  @newsize: the new number of buckets
+ *
+ * Returns: 0 on success, 1 on error (memory)
+ */
+int hash_resize(hash_table *h, size_t newsize);
+
+
 #endif /* HASH_H__ */
