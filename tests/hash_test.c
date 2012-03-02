@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #include "hash.h"
 
@@ -47,10 +48,11 @@ char *strduprev(char *str)
 }
 
 
-void fill_words(hash_table *h, char *file)
+void fill_words(hash_table *h, char *file, int n)
 {
 	FILE *fp = fopen(file, "r");
 	char buf[1024];
+	int i = 0;
 	if(fp == NULL)	{
 		printf("Cannot open %s\n", file);
 		exit(1);
@@ -59,6 +61,8 @@ void fill_words(hash_table *h, char *file)
 	while(fgets(buf, 1024, fp) != NULL)	{
 		buf[strlen(buf) - 1] = '\0';
 		hash_insert(h, buf, strduprev(buf));
+		if(++i > n && n > 0)
+			break;
 	}
 	fclose(fp);
 }
@@ -67,8 +71,12 @@ int main(int argc, char const *argv[])
 {
 	hash_table *hash;
 
-	hash = hash_init(NULL);
+	hash = hash_init(NULL, 90);
+
 	hash_set_autofree(hash);
+	hash_set_autogrow(hash, 1.0, 2.0);
+
+	setlinebuf(stdout);
 
 	hash_insert_string(hash, "California", "Sacremento");
 	hash_insert_string(hash, "Virginia", "Richmond");
@@ -80,24 +88,11 @@ int main(int argc, char const *argv[])
 	printf("2. %s\n", hash_get(hash, "Wut"));
 
 
-	fill_words(hash, "data/words.txt");
+	fill_words(hash, "data/wordlist.txt", 2000);
 	hash_insert_string(hash, "woodland", "creatures");
 	hash_insert_string(hash, "look", "overwritten");
-	print_hash(hash);
 
-	hash_resize(hash, 4);
 
-	print_hash(hash);
-
-	hash_resize(hash, 75);
-
-	print_hash(hash);
-
-	hash_resize(hash, 16);
-
-	print_hash(hash);
-
-	
 	hash_destroy(hash);
 	return 0;
 }

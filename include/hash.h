@@ -2,6 +2,7 @@
 #define HASH_H__
 
 #include <stddef.h>
+#include <stdio.h>
 
 #define INIT_HASH_TBL_SIZE 10
 
@@ -20,6 +21,9 @@ typedef struct _hash_table {
 	size_t size;	/* Number of buckets */
 	size_t nelm;	/* Number of elements in hash table */
 	int autofree;	/* Bool flag if we call free() on bucket->data */
+	int autogrow;	/* Bool flag if we want to automatically expand on insert */
+	float g_factor; /* How much larger to grow on an expansion (%) */
+	float g_trigger;	/* nelm/size to trigger an expansion */
 	bucket_data **buckets;
 	hash_fn_t hash_fn;
 } hash_table;
@@ -52,6 +56,25 @@ inline void hash_set_autofree(hash_table *h)
 	h->autofree = 1;
 }
 
+inline void hash_set_autogrow(hash_table *h, float trigger, float factor)
+{
+	if(trigger > 0.0 && factor > 1.0)	{
+		h->autogrow = 1;
+		h->g_factor = factor;
+		h->g_trigger = trigger;
+	} else {
+		h->autogrow = 0;
+		fputs("Library error: hash_table autogrow needs factor > 1.0 and "
+			  "trigger > 0.0\n", stderr);
+	}
+}
+
+inline void hash_unset_autogrow(hash_table *h)
+{
+	h->g_factor = 1.0;
+	h->autogrow = 0;
+}
+
 
 /**
  * hash_init() -- initalize a new hash table with hash function @hash_fn
@@ -60,8 +83,7 @@ inline void hash_set_autofree(hash_table *h)
  *
  * Returns: new empty hash table of INIT_HASH_TBL_SIZE size, NULL on failure
  */
-hash_table *hash_init(hash_fn_t hash_fn);
-
+hash_table *hash_init(hash_fn_t hash_fn, size_t initial_size);
 
 /**
  * hash_destroy() -- free all memory associated with hash table

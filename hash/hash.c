@@ -1,26 +1,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <math.h>
 
 #include "hash.h"
 
 
-hash_table *hash_init(hash_fn_t hash_fn)
+hash_table *hash_init(hash_fn_t hash_fn, size_t initial_size)
 {
 	hash_table *h = malloc(sizeof(hash_table));
+	size_t i;
 
 	if(h != NULL)	{
 		/* Did we supply a hash function? */
 		h->hash_fn = (hash_fn == NULL) ? &default_hash_fn : hash_fn;
-		/* TODO: make this a parameter? */
-		h->size = INIT_HASH_TBL_SIZE;
+		/* How about an initial size */
+		h->size = (initial_size == 0) ? INIT_HASH_TBL_SIZE : initial_size;
 		h->nelm = 0;
 		h->autofree = 0;
 		h->buckets = calloc(h->size, sizeof(bucket_data *));
-		if(h->buckets != NULL)
+		if(h->buckets != NULL)	{
+			for(i = 0; i < h->size; i++)
+				h->buckets[i] = NULL;
 			return h;
-		else
+		} else {
 			free(h);
+		}
 	}
 	return NULL;
 }
@@ -56,6 +61,17 @@ int hash_insert(hash_table *h, const char *key, void *data)
 	bucket_data *b, *pb = NULL;
 	unsigned int idx = h->hash_fn(key) % h->size;
 
+	if(h->autogrow)	{
+		float load = (float)h->nelm / (float)h->size;
+		if(load > h->g_trigger)	{
+			size_t newsize = ceil((float)h->size * h->g_factor);
+			printf("Load (%.2f) > %.2f -- resize up %.2f to %d\n",
+				   load, h->g_trigger, h->g_factor, newsize);
+			if(hash_resize(h, newsize) != 0)
+				return 1;
+		}
+	}
+
 	b = h->buckets[idx];
 
 	while(b != NULL)	{
@@ -78,6 +94,7 @@ int hash_insert(hash_table *h, const char *key, void *data)
 	}
 
 	b->data = data;
+	b->next = NULL;
 
 	if(pb != NULL)
 		pb->next = b;
