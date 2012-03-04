@@ -9,6 +9,9 @@
 /* Hash function type -- maps strings to unsigned ints */
 typedef unsigned int (*hash_fn_t)(const char *);
 
+#define HASH_AUTOFREE_	32	/* Call free() on each value on destroy */
+#define HASH_AUTOGROW_	64	/* Grow hash via rehash automatically */
+
 typedef struct _bucket_data
 {
 	char *key;
@@ -18,14 +21,13 @@ typedef struct _bucket_data
 } bucket_data;
 
 typedef struct _hash_table {
-	size_t size;	/* Number of buckets */
-	size_t nelm;	/* Number of elements in hash table */
-	int autofree;	/* Bool flag if we call free() on bucket->data */
-	int autogrow;	/* Bool flag if we want to automatically expand on insert */
-	float g_factor; /* How much larger to grow on an expansion (%) */
-	float g_trigger;	/* nelm/size to trigger an expansion */
 	bucket_data **buckets;
 	hash_fn_t hash_fn;
+	size_t size;	/* Number of buckets */
+	size_t nelm;	/* Number of elements in hash table */
+	float g_factor; /* How much larger to grow on an expansion (%) */
+	float g_trigger;	/* nelm/size to trigger an expansion */
+	unsigned char flags;	/* Holds various on/off flags */
 } hash_table;
 
 /**
@@ -53,17 +55,17 @@ unsigned int default_hash_fn(const char *key)
 
 inline void hash_set_autofree(hash_table *h)
 {
-	h->autofree = 1;
+	h->flags |= HASH_AUTOFREE_;
 }
 
 inline void hash_set_autogrow(hash_table *h, float trigger, float factor)
 {
 	if(trigger > 0.0 && factor > 1.0)	{
-		h->autogrow = 1;
+		h->flags |= HASH_AUTOGROW_;
 		h->g_factor = factor;
 		h->g_trigger = trigger;
 	} else {
-		h->autogrow = 0;
+		h->flags &= ~HASH_AUTOGROW_;
 		fputs("Library error: hash_table autogrow needs factor > 1.0 and "
 			  "trigger > 0.0\n", stderr);
 	}
@@ -72,7 +74,7 @@ inline void hash_set_autogrow(hash_table *h, float trigger, float factor)
 inline void hash_unset_autogrow(hash_table *h)
 {
 	h->g_factor = 1.0;
-	h->autogrow = 0;
+	h->flags &= ~HASH_AUTOGROW_;
 }
 
 

@@ -88,7 +88,7 @@ int main(int argc, char const *argv[])
 	printf("2. %s\n", hash_get(hash, "Wut"));
 
 
-	fill_words(hash, "data/wordlist.txt", 2000);
+	fill_words(hash, "data/wordlist.txt", 20000);
 	hash_insert_string(hash, "woodland", "creatures");
 	hash_insert_string(hash, "look", "overwritten");
 
