@@ -9,8 +9,8 @@
 /* Hash function type -- maps strings to unsigned ints */
 typedef unsigned int (*hash_fn_t)(const char *);
 
-#define HASH_AUTOFREE_	32	/* Call free() on each value on destroy */
-#define HASH_AUTOGROW_	64	/* Grow hash via rehash automatically */
+#define HASH_AUTOFREE_	0x01	/* Call free() on each value on destroy */
+#define HASH_AUTOGROW_	0x02	/* Grow hash via rehash automatically */
 
 typedef struct _bucket_data
 {
@@ -58,6 +58,13 @@ inline void hash_set_autofree(hash_table *h)
 	h->flags |= HASH_AUTOFREE_;
 }
 
+/**
+ * hash_set_autogrow() -- enable and set parameters for automatic re-hash on
+ *                        insert if the table grows too large
+ *	@h -- hash table to operate on
+ *  @trigger -- nelm/nbuckets ratio to trigger a growth
+ *  @factor -- scaling factor to grow, new_size = k * old_size, k > 1.0
+ */
 inline void hash_set_autogrow(hash_table *h, float trigger, float factor)
 {
 	if(trigger > 0.0 && factor > 1.0)	{
@@ -76,7 +83,6 @@ inline void hash_unset_autogrow(hash_table *h)
 	h->g_factor = 1.0;
 	h->flags &= ~HASH_AUTOGROW_;
 }
-
 
 /**
  * hash_init() -- initalize a new hash table with hash function @hash_fn

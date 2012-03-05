@@ -9,7 +9,6 @@
 hash_table *hash_init(hash_fn_t hash_fn, size_t initial_size)
 {
 	hash_table *h = malloc(sizeof(hash_table));
-	size_t i;
 
 	if(h != NULL)	{
 		/* Did we supply a hash function? */
@@ -18,10 +17,11 @@ hash_table *hash_init(hash_fn_t hash_fn, size_t initial_size)
 		h->size = (initial_size == 0) ? INIT_HASH_TBL_SIZE : initial_size;
 		h->nelm = 0;
 		h->flags = 0;
-		h->buckets = calloc(h->size, sizeof(bucket_data *));
+		h->g_trigger = 1.0;
 		h->g_factor = 2.0;
-		h->g_trigger = 2.0;
+		h->buckets = calloc(h->size, sizeof(bucket_data *));
 		if(h->buckets != NULL)	{
+			size_t i;
 			for(i = 0; i < h->size; i++)
 				h->buckets[i] = NULL;
 			return h;
@@ -174,7 +174,7 @@ int hash_resize(hash_table *h, size_t newsize)
 		return 1;
 	for(i = 0; i < h->size; i++)	{
 		b = h->buckets[i];
-		/* For each old bucket, insert into new bucket list(s) */
+		/* For each old bucket item, insert into correct new bucket */
 		while(b)	{
 			unsigned int idx = h->hash_fn(b->key) % newsize;
 			next = b->next;
