@@ -43,11 +43,11 @@ void inorder_dot(struct btnode *b)
 	if(b == NULL)
 		return;
 	inorder_dot(b->left);
+	inorder_dot(b->right);
 	if(b->left)
 		printf("\t%d -> %d\n", *(int *)b->data, *(int *)b->left->data);
 	if(b->right)
 		printf("\t%d -> %d\n", *(int *)b->data, *(int *)b->right->data);
-	inorder_dot(b->right);
 }
 
 int main(int argc, char *argv[])
@@ -61,9 +61,16 @@ int main(int argc, char *argv[])
 	while(*p)
 		bintree_insert(bt, p++);
 
-	puts("digraph tree {");
+	/*puts("digraph tree {");
+	inorder_dot(bt->root);
+	puts("}\n");*/
+
+	bintree_delete(bt, a + 3);
+
+	puts("digraph tree2 {");
 	inorder_dot(bt->root);
 	puts("}\n");
+
 
 	destroy_bintree(bt);
 

@@ -22,4 +22,6 @@ void *bintree_search(struct binary_tree *bt, void *data);
 
 int bintree_insert(struct binary_tree *bt, void *data);
 
+int bintree_delete(struct binary_tree *bt, void *value);
+
 #endif /* TREE_H_ */

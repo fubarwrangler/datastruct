@@ -72,4 +72,31 @@ int bintree_insert(struct binary_tree *bt, void *data)
 	return 1;
 }
 
+int bintree_delete(struct binary_tree *bt, void *value)
+{
+	struct btnode **n = btn_srch(bt, value);
+	struct btnode *p, **q;
 
+	if(*n == NULL)
+		return 1;
+
+	p = *n;
+
+	if(p->left == NULL)	{
+		n = &p->right;
+	} else if(p->right == NULL)	{
+		n = &p->left;
+	} else {
+		struct btnode *tmp;
+		q = &p->right;
+		while((*q)->left)
+			q = &(*q)->left;
+		(*n)->data = (*q)->data;
+		tmp = *q;
+		free(tmp);
+		/* free(tmpdata) */
+		q = &(*q)->right;
+	}
+
+	return 0;
+}
