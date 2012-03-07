@@ -72,31 +72,38 @@ int bintree_insert(struct binary_tree *bt, void *data)
 	return 1;
 }
 
+void bt_delnode(struct btnode **node)
+{
+	struct btnode *p, *q;
+
+	p = *node;
+
+	if(p->left == NULL)	{
+		*node = p->right;
+	} else if(p->right == NULL)	{
+		*node = p->left;
+	} else {
+		struct btnode **tmp, **n;
+		n = &p->right;
+		while((*n)->left)
+			n = &(*n)->left;
+		(*node)->data = (*n)->data;
+
+		/* Should only ever recurse once */
+		bt_delnode(n);
+		return ;
+	}
+	free(p);
+
+}
+
 int bintree_delete(struct binary_tree *bt, void *value)
 {
 	struct btnode **n = btn_srch(bt, value);
-	struct btnode *p, **q;
 
 	if(*n == NULL)
 		return 1;
-
-	p = *n;
-
-	if(p->left == NULL)	{
-		n = &p->right;
-	} else if(p->right == NULL)	{
-		n = &p->left;
-	} else {
-		struct btnode *tmp;
-		q = &p->right;
-		while((*q)->left)
-			q = &(*q)->left;
-		(*n)->data = (*q)->data;
-		tmp = *q;
-		free(tmp);
-		/* free(tmpdata) */
-		q = &(*q)->right;
-	}
-
+	else
+		bt_delnode(n);
 	return 0;
 }

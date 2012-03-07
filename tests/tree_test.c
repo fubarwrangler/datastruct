@@ -61,11 +61,14 @@ int main(int argc, char *argv[])
 	while(*p)
 		bintree_insert(bt, p++);
 
-	/*puts("digraph tree {");
+/*	puts("digraph tree {");
 	inorder_dot(bt->root);
-	puts("}\n");*/
+	puts("}\n");
+*/
 
-	bintree_delete(bt, a + 3);
+	bintree_delete(bt, a);
+	bintree_delete(bt, a + 1);
+	bintree_delete(bt, a + 7);
 
 	puts("digraph tree2 {");
 	inorder_dot(bt->root);
