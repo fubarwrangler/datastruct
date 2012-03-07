@@ -66,9 +66,9 @@ int main(int argc, char *argv[])
 	puts("}\n");
 */
 
-	bintree_delete(bt, a);
-	bintree_delete(bt, a + 1);
-	bintree_delete(bt, a + 7);
+	//bintree_delete(bt, a);
+	//bintree_delete(bt, a + 1);
+	bintree_delete(bt, a + 3);
 
 	puts("digraph tree2 {");
 	inorder_dot(bt->root);
