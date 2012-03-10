@@ -30,6 +30,11 @@ typedef struct _hash_table {
 	unsigned char flags;	/* Holds various on/off flags */
 } hash_table;
 
+typedef struct _hash_iter {
+	bucket_data *bucket;
+	size_t idx;
+} hash_iter;
+
 /**
  * This is the hash to use if no user-supplied one is provided, it is an
  * implementation of Jenkins's hash -- a good general purpose hash function
@@ -149,6 +154,26 @@ int hash_delete(hash_table *h, const char *key);
  * Returns: 0 on success, 1 on error (memory)
  */
 int hash_resize(hash_table *h, size_t newsize);
+
+
+/**
+ * hash_iter_init() -- initalize an iterator over all elements of @h
+ *  @h -- hash to iterate over
+ *  @state -- structure to hold context of iterator currently
+ */
+void hash_iter_init(hash_table *h, hash_iter *state);
+
+
+/**
+ * hash_iterate() -- walk over all hash elements in an undefined order
+ *  @h -- table to walk over
+ *  @state -- to store context of current state
+ *  @key, @value -- pointers to pointers that will point at each element's
+ *                  key and value if there are still elements left
+ *
+ * Returns: 1 if there are still elements, 0 if the current one is the last
+ */
+int hash_iterate(hash_table *h, hash_iter *state, void **key, void **val);
 
 
 #endif /* HASH_H__ */

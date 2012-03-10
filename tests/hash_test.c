@@ -70,11 +70,13 @@ void fill_words(hash_table *h, char *file, int n)
 int main(int argc, char const *argv[])
 {
 	hash_table *hash;
+	hash_iter iter;
+	void *key, *val;
 
-	hash = hash_init(NULL, 90);
+	hash = hash_init(NULL, 7);
 
 	hash_set_autofree(hash);
-	hash_set_autogrow(hash, 1.0, 2.0);
+	hash_set_autogrow(hash, 1.0, 1.92);
 
 	setlinebuf(stdout);
 
@@ -91,6 +93,13 @@ int main(int argc, char const *argv[])
 	fill_words(hash, "data/wordlist.txt", 20000);
 	hash_insert_string(hash, "woodland", "creatures");
 	hash_insert_string(hash, "look", "overwritten");
+
+
+	hash_iter_init(hash, &iter);
+	while(hash_iterate(hash, &iter, &key, &val) != 0)	{
+		printf("%s: %s\n", (char *)key, (char *)val);
+	}
+
 
 
 	hash_destroy(hash);
