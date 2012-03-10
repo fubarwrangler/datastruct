@@ -61,6 +61,8 @@ void *bintree_search(struct binary_tree *bt, void *data)
 int bintree_insert(struct binary_tree *bt, void *data)
 {
 	struct btnode **n = btn_srch(bt, data);
+
+	/* Find where we want to go and allocate space for node */
 	if(*n == NULL)	{
 		*n = malloc(sizeof(struct btnode));
 		if(*n == NULL)
@@ -72,38 +74,38 @@ int bintree_insert(struct binary_tree *bt, void *data)
 	return 1;
 }
 
-void bt_delnode(struct btnode **node)
+int bintree_delete(struct binary_tree *bt, void *value)
 {
 	struct btnode *p, *q;
+	struct btnode **node = btn_srch(bt, value);
 
+	if(*node == NULL)
+		return 1;
+
+	/* Store current place for future freeing */
 	p = *node;
 
+	/* If either subtree is NULL, replace node with subtree */
 	if(p->left == NULL)	{
 		*node = p->right;
 	} else if(p->right == NULL)	{
 		*node = p->left;
+
+	/* Otherwise find the successor -- left-most of right subtree -- replace
+	 * node's value with that of the successor, and remove the successor by
+	 * replacing it with its possible right subtree.
+	 */
 	} else {
-		struct btnode **tmp, **n;
+		struct btnode **n;
 		n = &p->right;
 		while((*n)->left)
 			n = &(*n)->left;
 		(*node)->data = (*n)->data;
-
-		/* Should only ever recurse once */
-		bt_delnode(n);
-		return ;
+		/* Here we want to free this one, not the actual node so we save it */
+		p = *n;
+		*n = (*n)->right;
 	}
 	free(p);
 
-}
-
-int bintree_delete(struct binary_tree *bt, void *value)
-{
-	struct btnode **n = btn_srch(bt, value);
-
-	if(*n == NULL)
-		return 1;
-	else
-		bt_delnode(n);
 	return 0;
 }
