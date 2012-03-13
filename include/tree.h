@@ -9,19 +9,19 @@ struct btnode {
 	void *data;
 };
 
-struct binary_tree {
+typedef struct _binary_tree {
 	struct btnode *root;
 	bintree_cmp cmp_fn;
-};
+} binary_tree;
 
-struct binary_tree *init_bintree(bintree_cmp cmp_fn);
+binary_tree *init_bintree(bintree_cmp cmp_fn);
 
-void destroy_bintree(struct binary_tree *bt);
+void destroy_bintree(binary_tree *bt);
 
-void *bintree_search(struct binary_tree *bt, void *data);
+void *bintree_search(binary_tree *bt, void *data);
 
-int bintree_insert(struct binary_tree *bt, void *data);
+int bintree_insert(binary_tree *bt, void *data);
 
-int bintree_delete(struct binary_tree *bt, void *value);
+int bintree_delete(binary_tree *bt, void *value);
 
 #endif /* TREE_H_ */

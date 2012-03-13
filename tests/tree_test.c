@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 #include "tree.h"
 
@@ -50,32 +51,37 @@ void inorder_dot(struct btnode *b)
 		printf("\t%d -> %d\n", *(int *)b->data, *(int *)b->right->data);
 }
 
+int *mklist(int len)
+{
+	int i;
+	int *a = malloc(len * sizeof(int));
+	srand(getpid());
+	for(i = 0; i < len - 2; i++)
+		a[i] = 1 + (rand() % 5111);
+	a[len - 1] = 0;
+	return a;
+}
+
 int main(int argc, char *argv[])
 {
 	int a[] = {5, 31, 2, 9, 24, 12, 7, 19, 30, 35, 2, 4, 0};
-	int *p = a;
-	struct binary_tree *bt;
+	int *b, *p;
+	binary_tree *bt;
 
+	b = mklist(100);
+	p = b;
 	bt = init_bintree(&intcmp);
 
 	while(*p)
 		bintree_insert(bt, p++);
 
-/*	puts("digraph tree {");
-	inorder_dot(bt->root);
-	puts("}\n");
-*/
-
-	//bintree_delete(bt, a);
-	//bintree_delete(bt, a + 1);
-	bintree_delete(bt, a + 3);
-
 	puts("digraph tree2 {");
 	inorder_dot(bt->root);
 	puts("}\n");
 
-
 	destroy_bintree(bt);
+
+	free(b);
 
 	return 0;
 

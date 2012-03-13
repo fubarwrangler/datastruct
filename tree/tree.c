@@ -4,9 +4,9 @@
 #include "tree.h"
 
 
-struct binary_tree *init_bintree(bintree_cmp cmp_fn)
+binary_tree *init_bintree(bintree_cmp cmp_fn)
 {
-	struct binary_tree *b = malloc(sizeof(struct binary_tree));
+	binary_tree *b = malloc(sizeof(binary_tree));
 	if(b != NULL)	{
 		b->cmp_fn = cmp_fn;
 		b->root = NULL;
@@ -23,7 +23,7 @@ static void freetree(struct btnode *p)
 	free(p);
 }
 
-void destroy_bintree(struct binary_tree *bt)
+void destroy_bintree(binary_tree *bt)
 {
 	struct btnode *n = bt->root;
 	freetree(bt->root);
@@ -31,7 +31,7 @@ void destroy_bintree(struct binary_tree *bt)
 	free(bt);
 }
 
-static struct btnode **btn_srch(struct binary_tree *bt, void *data)
+static struct btnode **btn_srch(binary_tree *bt, void *data)
 {
 	struct btnode **n = &(bt->root);
 	int res;
@@ -49,7 +49,7 @@ static struct btnode **btn_srch(struct binary_tree *bt, void *data)
 	return n;
 }
 
-void *bintree_search(struct binary_tree *bt, void *data)
+void *bintree_search(binary_tree *bt, void *data)
 {
 	struct btnode **n = btn_srch(bt, data);
 	if(*n != NULL)
@@ -58,7 +58,7 @@ void *bintree_search(struct binary_tree *bt, void *data)
 		return *n;
 }
 
-int bintree_insert(struct binary_tree *bt, void *data)
+int bintree_insert(binary_tree *bt, void *data)
 {
 	struct btnode **n = btn_srch(bt, data);
 
@@ -74,7 +74,7 @@ int bintree_insert(struct binary_tree *bt, void *data)
 	return 1;
 }
 
-int bintree_delete(struct binary_tree *bt, void *value)
+int bintree_delete(binary_tree *bt, void *value)
 {
 	struct btnode *p, *q;
 	struct btnode **node = btn_srch(bt, value);
