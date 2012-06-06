@@ -73,7 +73,7 @@ int main(int argc, char const *argv[])
 	hash_iter iter;
 	void *key, *val;
 
-	hash = hash_init(NULL, 7);
+	hash = hash_init(NULL, 10);
 
 	hash_set_autofree(hash);
 	hash_set_autogrow(hash, 1.0, 1.92);
@@ -89,16 +89,22 @@ int main(int argc, char const *argv[])
 	printf("1. %s\n", hash_get(hash, "California"));
 	printf("2. %s\n", hash_get(hash, "Wut"));
 
+	print_hash(hash);
 
-	fill_words(hash, "data/wordlist.txt", 20000);
+
+	fill_words(hash, "data/wordlist.txt", 400);
 	hash_insert_string(hash, "woodland", "creatures");
 	hash_insert_string(hash, "look", "overwritten");
 
+	hash_delete(hash, "Lol");
 
-	hash_iter_init(hash, &iter);
+	hash_delete(hash, "look");
+	print_hash(hash);
+
+	/*hash_iter_init(hash, &iter);
 	while(hash_iterate(hash, &iter, &key, &val) != 0)	{
 		printf("%s: %s\n", (char *)key, (char *)val);
-	}
+	}*/
 
 
 

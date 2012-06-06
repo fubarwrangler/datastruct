@@ -56,7 +56,7 @@ int main(int argc, char const *argv[])
 	//hash_set_autofree(hash);
 	hash_set_autogrow(hash, 1.0, 1.92);
 
-	fill_words(hash, "data/wordlist.txt", 4000);
+	fill_words(hash, "data/wordlist.txt", 400);
 
 
 	hash_iter_init(hash, &iter);
