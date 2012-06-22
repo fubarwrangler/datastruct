@@ -8,6 +8,7 @@
 
 /* Hash function type -- maps strings to unsigned ints */
 typedef unsigned int (*hash_fn_t)(const char *);
+typedef void (*hash_callback_fn_t)(void *);
 
 #define HASH_AUTOFREE_	0x01	/* Call free() on each value on destroy */
 #define HASH_AUTOGROW_	0x02	/* Grow hash via rehash automatically */
@@ -35,6 +36,7 @@ typedef struct _hash_iter {
 	size_t idx;
 } hash_iter;
 
+
 /**
  * This is the hash to use if no user-supplied one is provided, it is an
  * implementation of Jenkins's hash -- a good general purpose hash function
@@ -42,26 +44,7 @@ typedef struct _hash_iter {
  *
  * SOURCE: Jenkins, Bob (September 1997). "Hash functions". Dr. Dobbs Journal.
  */
-unsigned int default_hash_fn(const char *key)
-{
-    unsigned int hash = 0;
-
-    while(*key)
-    {
-        hash += *key++;
-        hash += (hash << 10);
-        hash ^= (hash >> 6);
-    }
-    hash += (hash << 3);
-    hash ^= (hash >> 11);
-    hash += (hash << 15);
-    return hash;
-}
-
-inline void hash_set_autofree(hash_table *h)
-{
-	h->flags |= HASH_AUTOFREE_;
-}
+unsigned int default_hash_fn(const char *key);
 
 /**
  * hash_set_autogrow() -- enable and set parameters for automatic re-hash on
@@ -70,24 +53,9 @@ inline void hash_set_autofree(hash_table *h)
  *  @trigger -- nelm/nbuckets ratio to trigger a growth
  *  @factor -- scaling factor to grow, new_size = k * old_size, k > 1.0
  */
-inline void hash_set_autogrow(hash_table *h, float trigger, float factor)
-{
-	if(trigger > 0.0 && factor > 1.0)	{
-		h->flags |= HASH_AUTOGROW_;
-		h->g_factor = factor;
-		h->g_trigger = trigger;
-	} else {
-		h->flags &= ~HASH_AUTOGROW_;
-		fputs("Library error: hash_table autogrow needs factor > 1.0 and "
-			  "trigger > 0.0\n", stderr);
-	}
-}
-
-inline void hash_unset_autogrow(hash_table *h)
-{
-	h->g_factor = 1.0;
-	h->flags &= ~HASH_AUTOGROW_;
-}
+void hash_set_autogrow(hash_table *h, float trigger, float factor);
+void hash_unset_autogrow(hash_table *h);
+void hash_set_autofree(hash_table *h);
 
 /**
  * hash_init() -- initalize a new hash table with hash function @hash_fn
@@ -104,6 +72,15 @@ hash_table *hash_init(hash_fn_t hash_fn, size_t initial_size);
  * @h: hash table to free
  */
 void hash_destroy(hash_table *h);
+
+/**
+ * hash_destroy_callback() -- free a hash table, calling custom function @cb on
+ *                            each data pointer
+ *  @h -- hash table to free
+ *  @cb -- callback function takes (void *) called with each ->data member
+ *         WARNING: must free this pointer if desired, even if autofree is set.
+ */
+void hash_destroy_callback(hash_table *h, hash_callback_fn_t cb);
 
 /**
  * hash_insert() -- insert a key/data pair into a hash table
@@ -145,7 +122,6 @@ void *hash_get(hash_table *h, const char *key);
  */
 int hash_delete(hash_table *h, const char *key);
 
-
 /**
  * hash_resize() -- resize a hash table, rehashing all keys into new buckets
  *  @h: hash table
@@ -155,14 +131,12 @@ int hash_delete(hash_table *h, const char *key);
  */
 int hash_resize(hash_table *h, size_t newsize);
 
-
 /**
  * hash_iter_init() -- initalize an iterator over all elements of @h
  *  @h -- hash to iterate over
  *  @state -- structure to hold context of iterator currently
  */
 void hash_iter_init(hash_table *h, hash_iter *state);
-
 
 /**
  * hash_iterate() -- walk over all hash elements in an undefined order

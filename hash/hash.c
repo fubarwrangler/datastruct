@@ -6,6 +6,47 @@
 #include "hash.h"
 
 
+unsigned int default_hash_fn(const char *key)
+{
+    unsigned int hash = 0;
+
+    while(*key)
+    {
+        hash += *key++;
+        hash += (hash << 10);
+        hash ^= (hash >> 6);
+    }
+    hash += (hash << 3);
+    hash ^= (hash >> 11);
+    hash += (hash << 15);
+    return hash;
+}
+
+void hash_set_autofree(hash_table *h)
+{
+	h->flags |= HASH_AUTOFREE_;
+}
+
+void hash_set_autogrow(hash_table *h, float trigger, float factor)
+{
+	if(trigger > 0.0 && factor > 1.0)	{
+		h->flags |= HASH_AUTOGROW_;
+		h->g_factor = factor;
+		h->g_trigger = trigger;
+	} else {
+		h->flags &= ~HASH_AUTOGROW_;
+		fputs("Library error: hash_table autogrow needs factor > 1.0 and "
+			  "trigger > 0.0\n", stderr);
+	}
+}
+
+void hash_unset_autogrow(hash_table *h)
+{
+	h->g_factor = 1.0;
+	h->flags &= ~HASH_AUTOGROW_;
+}
+
+
 hash_table *hash_init(hash_fn_t hash_fn, size_t initial_size)
 {
 	hash_table *h = malloc(sizeof(hash_table));
@@ -47,6 +88,29 @@ void hash_destroy(hash_table *h)
 					free(b->key);
 					if(h->flags & HASH_AUTOFREE_)
 						free(b->data);
+					free(b);
+					b = nb;
+				}
+			}
+			free(h->buckets);
+		}
+		free(h);
+	}
+}
+
+void hash_destroy_callback(hash_table *h, hash_callback_fn_t cb)
+{
+	if(h!=NULL)	{
+		if(h->buckets != NULL)	{
+			bucket_data *b, *nb;
+			int i;
+
+			for(i = 0; i < h->size; i++)	{
+				b = h->buckets[i];
+				while(b != NULL)	{
+					nb = b->next;
+					free(b->key);
+					(*cb)(b->data);
 					free(b);
 					b = nb;
 				}
@@ -103,6 +167,7 @@ int hash_insert(hash_table *h, const char *key, void *data)
 	h->nelm++;
 	return 0;
 }
+
 
 int hash_insert_string(hash_table *h, const char *key, char *val)
 {
@@ -220,5 +285,3 @@ int hash_iterate(hash_table *h, hash_iter *state, void **key, void **val)
 	*val = state->bucket->data;
 	return 1;
 }
-
-
