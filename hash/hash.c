@@ -266,7 +266,7 @@ void hash_iter_init(hash_table *h, hash_iter *state)
 }
 
 
-int hash_iterate(hash_table *h, hash_iter *state, void **key, void **val)
+int hash_iterate(hash_table *h, hash_iter *state, char **key, void **val)
 {
 	if(state->bucket != NULL && state->bucket->next != NULL)	{
 		state->bucket = state->bucket->next;

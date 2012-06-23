@@ -147,7 +147,7 @@ void hash_iter_init(hash_table *h, hash_iter *state);
  *
  * Returns: 1 if there are still elements, 0 if the current one is the last
  */
-int hash_iterate(hash_table *h, hash_iter *state, void **key, void **val);
+int hash_iterate(hash_table *h, hash_iter *state, char **key, void **val);
 
 
 #endif /* HASH_H__ */
