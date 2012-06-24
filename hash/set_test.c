@@ -27,7 +27,7 @@ int main(int argc, char *argv[])
 
 	printf("calvin: %d\nhobz: %d\n", set_ismember(s, "calvin"), set_ismember(s, "hobz"));*/
 
-	r = set_and(s, t);
+	r = set_xor(s, t);
 
 	set_iter_init(r, &i);
 	while((p = set_iterate(r, &i)) != NULL)	{
@@ -37,6 +37,7 @@ int main(int argc, char *argv[])
 
 	set_destroy(s);
 	set_destroy(t);
+	set_destroy(r);
 
 
 	return 0;

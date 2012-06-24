@@ -72,7 +72,7 @@ size_t set_size(set *s)
 	return s->ht->nelm;
 }
 
-set *set_or(set *s1, set *s2)
+set *set_union(set *s1, set *s2)
 {
 	set_iter itr;
 	char *str;
@@ -87,7 +87,7 @@ set *set_or(set *s1, set *s2)
 }
 
 
-set *set_and(set *s1, set *s2)
+set *set_intersect(set *s1, set *s2)
 {
 	set_iter itr;
 	char *str;
@@ -106,5 +106,50 @@ set *set_and(set *s1, set *s2)
 	return s;
 }
 
+set *set_diff(set *s1, set *s2)
+{
+	set_iter itr;
+	set *new_set = set_init(set_size(s1) + set_size(s2) / 2);
+	char *elm;
+
+	for(set_iter_init(s1, &itr); (elm = set_iterate(s1, &itr)) != NULL; )	{
+		if(!set_ismember(s2, elm))
+			set_add(new_set, elm);
+	}
+
+	return new_set;
+}
 
 
+set *set_xor(set *s1, set *s2)
+{
+	set_iter itr;
+	set *new_set = set_init(set_size(s1) + set_size(s2) / 2);
+	char *elm;
+
+	for(set_iter_init(s1, &itr); (elm = set_iterate(s1, &itr)) != NULL; )	{
+		if(!set_ismember(s2, elm))
+			set_add(new_set, elm);
+	}
+
+	for(set_iter_init(s2, &itr); (elm = set_iterate(s2, &itr)) != NULL; )	{
+		if(!set_ismember(s1, elm))
+			set_add(new_set, elm);
+	}
+
+	return new_set;
+}
+
+
+int set_subset(set *s1, set *s2)
+{
+	set_iter itr;
+	char *elm;
+
+	for(set_iter_init(s2, &itr); (elm = set_iterate(s2, &itr)) != NULL; )	{
+		if(!set_ismember(s1, elm))
+			return 0;
+	}
+
+	return 1;
+}
