@@ -4,9 +4,10 @@
 #define SEARCH_START_HEAD 0
 #define SEARCH_START_TAIL 1
 
+#define DL_INDEX(l, n) dllist_get_index(l, n)
+
 typedef struct node
 {
-    size_t len;
     void *data;
     struct node *next;
     struct node *prev;
@@ -19,8 +20,9 @@ typedef struct dllist
     dlnode *tail;
 } dllist;
 
+typedef void (*dllist_map_fn_t)(void *);
+typedef int (*dllist_cmp_fn_t)(void *, void *);
 
-#define DL_INDEX(l, n) dllist_get_index(l, n)
 
 /**
  * Create/Destroy a new, empty doubly-linked-list object, returns NULL
@@ -28,18 +30,12 @@ typedef struct dllist
  */
 dllist *dllist_init(void);
 void dllist_destroy(dllist *l);
+void dllist_destroy_callback(dllist *list, dllist_map_fn_t fn);
 
 /**
  * Return the length of the given list, O(n): walks entire list
  */
 size_t dllist_size(dllist *list);
-
-/**
- * Create a dlnode structure from *data given, returns NULL on failure / Frees
- * ->data and then *node itself, setting it to NULL
- */
-dlnode *dllist_create_node(void *data, size_t len);
-void dllist_destroy_node(dlnode *node);
 
 /**
  * Return a pointer to a deep copy of *list, or NULL on failure
@@ -57,37 +53,31 @@ dlnode *dllist_get_index(dllist *list, size_t idx);
  */
 void dllist_swap(dllist *list, dlnode *n1, dlnode *n2);
 
-/**
- * Insert a new node with a copy of *data before or after the given *node, but
- * not if the node before/after *node is the head/tail of the list, because
- * although we could do it for after, we would lose the ability to track the
- * list's tail
- */
-dlnode *dllist_insert_after(dlnode *node, void *data, size_t len);
-dlnode *dllist_insert_before(dlnode *node, void *data, size_t len);
+
+dlnode *dllist_insert_after(dlnode *node, void *data);
 
 /**
- * Insert a node with a copy of *data at the begenning of *list, returns
+ * Insert a node at the begenning of *list, returns
  * pointer to new node, or NULL on failure
  */
-dlnode *dllist_insert(dllist *list, void *data, size_t len);
+dlnode *dllist_insert(dllist *list, void *data);
 
 /**
- * Makes a new node with a copy of *data and appends it to the end of *list.
+ * Appends a new node to the end of *list.
  * Returns a pointer to the new node or NULL on failure
  */
-dlnode *dllist_append(dllist *list, void *data, size_t len);
+dlnode *dllist_append(dllist *list, void *data);
 
 /**
  * Delete *node from *list, updating ->head / ->tail as necessary
  */
-void dllist_delete(dllist *list, dlnode *node);
+void *dllist_delete(dllist *list, dlnode *node);
 
 /**
  * Apply the function pointed to by (*fn) that takes a pointer to a ->data
  * element and (presumably) does something to it to each element of *list.
  */
-void dllist_apply_each(dllist *list, void (*fn)(void *));
+void dllist_apply_each(dllist *list, dllist_map_fn_t fn);
 
 /**
  * Join two lists, *second onto the end of *first, freeing the memory for
@@ -106,14 +96,14 @@ void dllist_reverse(dllist *list);
  * returns nonzero for not equal, 0 otherwise. Returns node where value is
  * found, or NULL if it isn't.
  */
-dlnode *dllist_search(dllist *list, void *value, int (*cmp)(void *a, void *b));
+dlnode *dllist_search(dllist *list, void *value, dllist_cmp_fn_t cmp);
 
 /**
  * Return the index of the first appearence of given *value, -1 on not-found
  */
-long dllist_find_index(dllist *list, void *value, int (*cmp)(void *, void *));
+long dllist_find_index(dllist *list, void *value, dllist_cmp_fn_t cmp);
 
-void dllist_sort(dllist *list, int (*cmp_fn)(void *, void *));
+void dllist_sort(dllist *list, dllist_cmp_fn_t *cmp);
 
 
 #endif

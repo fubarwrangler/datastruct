@@ -41,8 +41,8 @@ void list_printer(dllist *lst)
     printf("List: head->%p, tail->%p\n", lst->head, lst->tail);
     while(p)
     {
-        printf("%p: (%2d) %s (%ld) (prev -> %p) (next -> %p)\n",
-               p, ctr++, (char *)p->data, p->len, p->prev, p->next);
+        printf("%p: (%2d) %s (prev -> %p) (next -> %p)\n",
+               p, ctr++, (char *)p->data, p->prev, p->next);
         p = p->next;
     }
 }
@@ -68,9 +68,7 @@ int main(int argc, char *argv[])
     //dllist_append(words, "What", 5);
     while((fgets(tmp, 512, fp)) != NULL && j++ < 20)
     {
-        i = strlen(tmp);
-        tmp[i - 1] = '\0';
-        dllist_append(words, tmp, i);
+        dllist_append(words, tmp);
     }
 
     fclose(fp);
@@ -82,7 +80,7 @@ int main(int argc, char *argv[])
     list_printer(words);
 
     copy = dllist_copy(words);
-    (words, DL_INDEX(words, 0), DL_INDEX(words, 6));
+    //(words, DL_INDEX(words, 0), DL_INDEX(words, 6));
 
     printf("\nAfter swap & delete:\n");
     dllist_delete(words, words->tail->prev);
