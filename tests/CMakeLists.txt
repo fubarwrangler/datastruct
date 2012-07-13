@@ -19,3 +19,6 @@ target_link_libraries(tree_test bintree)
 
 add_executable(hash_to_tree hash_to_tree.c)
 target_link_libraries(hash_to_tree bintree hash)
+
+add_executable(war war.c)
+target_link_libraries(war llist)

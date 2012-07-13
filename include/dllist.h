@@ -21,6 +21,7 @@ typedef struct dllist
 } dllist;
 
 typedef void (*dllist_map_fn_t)(void *);
+typedef void (*dllist_copy_fn_t)(void **);
 typedef int (*dllist_cmp_fn_t)(void *, void *);
 
 
@@ -41,6 +42,8 @@ size_t dllist_size(dllist *list);
  * Return a pointer to a deep copy of *list, or NULL on failure
  */
 dllist *dllist_copy(dllist *list);
+dllist *dllist_deep_copy(dllist *lst, dllist_copy_fn_t cpy);
+
 
 /**
  * Return the node at index idx, like x = list[idx], also callable as DL_INDEX,

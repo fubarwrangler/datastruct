@@ -14,6 +14,13 @@ void myupper(void *str)
     while(*p++);
 }
 
+void mydup(void **p)
+{
+    char *str = (char *)*p;
+    char *tmp = strdup(str);
+    *p = tmp;
+}
+
 void *myprinter(void *str)
 {
     printf("%s\n", (char *)str);
@@ -63,12 +70,15 @@ int main(int argc, char *argv[])
         return 1;
     }
 
+    setbuf(stdout, NULL);
+
     words = dllist_init();
 
     //dllist_append(words, "What", 5);
-    while((fgets(tmp, 512, fp)) != NULL && j++ < 20)
+    while((fgets(tmp, 512, fp)) != NULL && j++ < 9)
     {
-        dllist_append(words, tmp);
+        tmp[strlen(tmp) - 1] = NULL;
+        dllist_append(words, strdup(tmp));
     }
 
     fclose(fp);
@@ -80,6 +90,8 @@ int main(int argc, char *argv[])
     list_printer(words);
 
     copy = dllist_copy(words);
+
+    dllist_apply_each(copy, mydup);
     //(words, DL_INDEX(words, 0), DL_INDEX(words, 6));
 
     printf("\nAfter swap & delete:\n");
@@ -89,7 +101,7 @@ int main(int argc, char *argv[])
 
     dllist_apply_each(copy, myupper);
     printf("Copy made uppercase: \n");
-    words = dllist_join(copy, words);
+    //words = dllist_join(copy, words);
     list_printer(copy);
     printf("Orig reversed:\n");
 

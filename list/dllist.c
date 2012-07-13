@@ -94,6 +94,7 @@ dlnode *dllist_append(dllist* list, void* data)
 			list->head = p;
 		list->tail = p;
 		p->prev = q;
+		p->next = NULL;
 	}
 	else
 		fprintf(stderr, "Library Error: dllist_append--No memory for new node");
@@ -228,7 +229,7 @@ void dllist_apply_each(dllist *list, dllist_map_fn_t fn)
 
 	while(p != NULL)
 	{
-		fn(p->data);
+		(*fn)(p->data);
 		p = p->next;
 	}
 }
@@ -251,6 +252,20 @@ dllist *dllist_copy(dllist *list)
 		}
 	}
 
+	return newlist;
+}
+
+dllist *dllist_deep_copy(dllist *list, dllist_copy_fn_t cpy)
+{
+	dllist *newlist = dllist_copy(list);
+
+	if(newlist != NULL)	{
+		dlnode *p = newlist->head;
+		while(p)	{
+			cpy(&(p)->data);
+			p = p->next;
+		}
+	}
 	return newlist;
 }
 
